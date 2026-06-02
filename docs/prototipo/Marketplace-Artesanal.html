@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace Artesanal · Desarrollo del TFM</title>
+<style>
+  :root {
+    --plum-950: #2a1226;
+    --plum-800: #45203d;
+    --plum-700: #5b2a4e;
+    --plum-600: #6e3260;
+    --plum-500: #8a4178;
+    --plum-300: #c79ebb;
+    --plum-100: #f4e9f1;
+    --plum-50:  #faf5f8;
+
+    --gold:     #b9883b;
+    --gold-soft:#e8d4a8;
+
+    --ink:      #241c22;
+    --muted:    #6f6470;
+    --line:     #ebe0e8;
+    --bg:       #fbf8fa;
+    --card:     #ffffff;
+
+    --ok:       #2f7a55;
+    --ok-bg:    #e6f3ec;
+    --no:       #a8424b;
+    --no-bg:    #f7e7e8;
+
+    --shadow:   0 1px 2px rgba(42,18,38,.04), 0 8px 24px rgba(42,18,38,.06);
+    --radius:   16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink); background: var(--bg); line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: Georgia, "Times New Roman", serif; line-height: 1.2; }
+  code { background: var(--plum-100); color: var(--plum-700); padding: 1px 6px; border-radius: 5px; font-size: .88em; }
+  a { color: var(--plum-600); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== Nav superior fija ===== */
+  .topnav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,.96); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 2px 14px rgba(42,18,38,.05);
+  }
+  /* Fila 1: marca + volver */
+  .topnav-top { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .topnav .brand { font-family: Georgia, serif; font-weight: 700; color: var(--plum-700); font-size: 1.05rem; text-decoration: none; display: flex; align-items: center; gap: 9px; }
+  .topnav .brand .badge-dot { width: 11px; height: 11px; border-radius: 3px; background: linear-gradient(135deg, var(--plum-600), var(--gold)); display: inline-block; }
+  .topnav .back {
+    font-size: .82rem; color: var(--plum-600); text-decoration: none; font-weight: 600;
+    white-space: nowrap; padding: 7px 14px; border: 1px solid var(--plum-300);
+    border-radius: 999px; transition: background .15s ease, color .15s ease;
+  }
+  .topnav .back:hover { background: var(--plum-600); color: #fff; border-color: var(--plum-600); }
+
+  /* Fila 2: navegación tipo pestañas (scroll horizontal en móvil) */
+  .section-nav {
+    display: flex; gap: 2px; border-top: 1px solid var(--line);
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .section-nav::-webkit-scrollbar { display: none; }
+  .section-nav a {
+    text-decoration: none; color: var(--muted); font-size: .86rem; font-weight: 500;
+    padding: 13px 15px; white-space: nowrap;
+    border-bottom: 2.5px solid transparent; transition: color .15s ease, border-color .15s ease;
+  }
+  .section-nav a:hover { color: var(--plum-700); }
+  .section-nav a.active { color: var(--plum-700); font-weight: 700; border-bottom-color: var(--plum-500); }
+
+  /* ===== Hero ===== */
+  header {
+    background: linear-gradient(135deg, var(--plum-800) 0%, var(--plum-600) 60%, var(--plum-500) 100%);
+    color: #fff; padding: 56px 0 50px; position: relative; overflow: hidden;
+  }
+  header::after { content:""; position:absolute; right:-90px; top:-90px; width:340px; height:340px; border-radius:50%; background: radial-gradient(circle, rgba(255,255,255,.12), transparent 70%); }
+  header .eyebrow { text-transform: uppercase; letter-spacing:.18em; font-size:.72rem; color: var(--gold-soft); font-weight:600; margin:0 0 12px; }
+  header h1 { font-size: 2.5rem; margin: 0 0 14px; max-width: 780px; }
+  header p { font-size: 1.06rem; color: #f0e4ed; max-width: 680px; margin: 0; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:26px; }
+  .chip { background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22); color:#fff; padding:5px 12px; border-radius:999px; font-size:.8rem; font-weight:500; }
+
+  /* ===== Secciones ===== */
+  section { padding: 46px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 116px; }
+  section:last-of-type { border-bottom: none; }
+  .kicker { text-transform: uppercase; letter-spacing:.14em; font-size:.74rem; color: var(--gold); font-weight:700; margin:0 0 8px; }
+  h2.sec { font-size: 1.9rem; color: var(--plum-700); margin: 0 0 6px; }
+  .sec-lead { color: var(--muted); margin: 0 0 28px; max-width: 760px; font-size: 1.02rem; }
+
+  /* ===== Tarjetas genéricas ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .box {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 24px; box-shadow: var(--shadow);
+  }
+  .box h3 { margin: 0 0 8px; font-size: 1.15rem; color: var(--ink); }
+  .box h3 .ico { color: var(--plum-500); margin-right: 6px; }
+  .box p { margin: 0; color: #463d45; font-size: .95rem; }
+  .box ul { margin: 8px 0 0; padding-left: 18px; color: #463d45; font-size: .93rem; }
+  .box ul li { margin-bottom: 5px; }
+
+  /* ===== Actores ===== */
+  .role { border-top: 4px solid var(--plum-500); }
+  .role.buyer { border-color: var(--plum-300); }
+  .role.seller { border-color: var(--plum-500); }
+  .role.admin { border-color: var(--gold); }
+  .role .tag { display:inline-block; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:3px 9px; border-radius:999px; background: var(--plum-100); color: var(--plum-700); margin-bottom:10px; }
+  .role.admin .tag { background: #fbf1dd; color: var(--gold); }
+
+  /* ===== Note box ===== */
+  .note-box { background: var(--plum-50); border:1px solid var(--line); border-left:4px solid var(--gold); border-radius:12px; padding:18px 22px; margin: 20px 0; }
+  .note-box p { margin:0; color: var(--muted); font-size:.95rem; }
+  .note-box strong { color: var(--plum-700); }
+
+  /* ===== Diagrama arquitectura ===== */
+  .arch { display:flex; align-items:stretch; gap:0; flex-wrap:wrap; }
+  .arch .layer { flex:1; min-width: 200px; background: var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow: var(--shadow); position: relative; }
+  .arch .arrow { display:flex; align-items:center; justify-content:center; font-size:1.4rem; color: var(--plum-300); padding: 0 6px; }
+  .arch .layer h4 { margin:0 0 4px; color: var(--plum-700); font-size:1rem; }
+  .arch .layer .sub { font-size:.78rem; color: var(--muted); margin-bottom:10px; }
+  .arch .layer .pillrow { display:flex; flex-wrap:wrap; gap:6px; }
+  .arch .layer .mini { font-size:.74rem; background: var(--plum-50); border:1px solid var(--line); padding:3px 8px; border-radius:6px; color:#4a414a; }
+
+  /* ===== Modelo de datos ===== */
+  .erd { display:flex; flex-wrap:wrap; gap:14px; }
+  .entity { background: var(--card); border:1px solid var(--line); border-radius:12px; box-shadow: var(--shadow); min-width: 200px; flex: 1; overflow: hidden; }
+  .entity .ehead { background: var(--plum-700); color:#fff; padding:9px 14px; font-weight:700; font-size:.9rem; font-family: Georgia, serif; }
+  .entity.key .ehead { background: var(--gold); }
+  .entity ul { list-style:none; margin:0; padding:8px 0; }
+  .entity li { padding:4px 14px; font-size:.82rem; color:#4a414a; display:flex; justify-content:space-between; gap:10px; }
+  .entity li .pk { color: var(--gold); font-weight:700; font-size:.7rem; }
+  .entity li .fk { color: var(--plum-500); font-weight:700; font-size:.7rem; }
+  .rel-list { margin-top: 18px; }
+  .rel-list li { font-size:.92rem; margin-bottom:6px; color:#463d45; }
+
+  /* ===== Tabla seguridad ===== */
+  .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width:100%; border-collapse: collapse; background: var(--card); font-size:.9rem; min-width: 640px; }
+  thead th { background: var(--plum-700); color:#fff; text-align:left; padding:12px 16px; font-weight:600; font-size:.82rem; }
+  tbody td { padding:11px 16px; border-top:1px solid var(--line); }
+  tbody tr:nth-child(even){ background: var(--plum-50); }
+  tbody td:first-child { font-family: ui-monospace, Menlo, monospace; font-size:.82rem; color: var(--plum-700); }
+  .roletag { font-size:.7rem; padding:2px 8px; border-radius:999px; font-weight:700; margin-right:4px; display:inline-block; }
+  .rt-pub { background:#eef0f2; color:#5a6270; }
+  .rt-buyer { background: var(--plum-100); color: var(--plum-700); }
+  .rt-seller { background: var(--ok-bg); color: var(--ok); }
+  .rt-admin { background:#fbf1dd; color: var(--gold); }
+
+  /* ===== Twist reputación ===== */
+  .formula { background: var(--plum-950); color: #f6eef3; border-radius:14px; padding: 20px 24px; font-family: ui-monospace, Menlo, monospace; font-size:.9rem; overflow-x:auto; margin: 18px 0; }
+  .formula .c { color: var(--gold-soft); }
+  .formula .v { color: #d9aee0; }
+
+  /* ===================================================== */
+  /* ===== MOCKUPS (borrador de UI) ===================== */
+  /* ===================================================== */
+  .browser { border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow: var(--shadow); background:#fff; margin-bottom: 12px; }
+  .browser .bar { background:#f0e9ee; padding:9px 14px; display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--line); }
+  .browser .bar .d { width:11px; height:11px; border-radius:50%; }
+  .browser .bar .d.r{background:#e0848c;} .browser .bar .d.y{background:#e8c878;} .browser .bar .d.g{background:#8fc6a3;}
+  .browser .bar .url { margin-left:10px; background:#fff; border:1px solid var(--line); border-radius:6px; font-size:.72rem; color: var(--muted); padding:3px 12px; flex:1; }
+  .mock-cap { font-size:.84rem; color: var(--muted); margin: 0 0 30px; text-align:center; }
+  .mock-cap b { color: var(--plum-700); }
+
+  /* App chrome dentro del mockup */
+  .app { font-size: 13px; color: var(--ink); }
+  .app .appbar { display:flex; align-items:center; gap:14px; padding:12px 18px; border-bottom:1px solid var(--line); background:#fff; }
+  .app .logo { font-family: Georgia, serif; font-weight:700; color: var(--plum-700); display:flex; align-items:center; gap:7px; }
+  .app .logo .sq { width:18px; height:18px; border-radius:5px; background: linear-gradient(135deg,var(--plum-600),var(--gold)); }
+  .app .search { flex:1; background: var(--plum-50); border:1px solid var(--line); border-radius:999px; padding:7px 14px; color: var(--muted); font-size:12px; }
+  .app .navicons { display:flex; gap:14px; color: var(--muted); align-items:center; }
+  .app .btn { background: var(--plum-600); color:#fff; border:none; border-radius:8px; padding:7px 14px; font-size:12px; font-weight:600; }
+  .app .btn.ghost { background:#fff; color: var(--plum-600); border:1px solid var(--plum-300); }
+  .app .pillnav { display:flex; gap:8px; padding:10px 18px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .app .pillnav span { font-size:11px; padding:4px 11px; border-radius:999px; background:#fff; border:1px solid var(--line); color: var(--muted); }
+  .app .pillnav span.on { background: var(--plum-100); color: var(--plum-700); border-color: var(--plum-300); font-weight:600; }
+
+  .shop { display:flex; }
+  .shop .filters { width:170px; border-right:1px solid var(--line); padding:16px; background: var(--plum-50); }
+  .shop .filters h5 { margin:0 0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color: var(--muted); font-family: inherit; }
+  .shop .filters .f { font-size:12px; color:#574e57; padding:4px 0; display:flex; align-items:center; gap:7px; }
+  .shop .filters .ck { width:13px; height:13px; border:1.5px solid var(--plum-300); border-radius:3px; }
+  .shop .filters .ck.on { background: var(--plum-500); border-color: var(--plum-500); }
+  .shop .filters hr { border:none; border-top:1px solid var(--line); margin:14px 0; }
+  .shop .stars { color: var(--gold); letter-spacing:1px; }
+  .shop .results { flex:1; padding:16px; }
+  .pgrid { display:grid; grid-template-columns: repeat(3,1fr); gap:14px; }
+  .pcard { border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#fff; }
+  .pcard .ph { height:90px; background: linear-gradient(135deg, var(--plum-100), #efe2ea); display:flex; align-items:center; justify-content:center; color: var(--plum-300); font-size:11px; }
+  .pcard .pb { padding:9px 11px; }
+  .pcard .pt { font-weight:600; font-size:12px; margin-bottom:2px; }
+  .pcard .pseller { font-size:10.5px; color: var(--muted); margin-bottom:6px; }
+  .pcard .prow { display:flex; justify-content:space-between; align-items:center; }
+  .pcard .price { font-weight:700; color: var(--plum-700); font-size:13px; }
+  .pcard .rate { font-size:10.5px; color: var(--gold); }
+
+  /* Ficha producto */
+  .detail { display:flex; gap:20px; padding:18px; }
+  .detail .gallery { width:46%; }
+  .detail .gallery .big { height:160px; background: linear-gradient(135deg, var(--plum-100), #efe2ea); border-radius:10px; display:flex; align-items:center; justify-content:center; color: var(--plum-300); font-size:12px; margin-bottom:8px; }
+  .detail .gallery .thumbs { display:flex; gap:6px; }
+  .detail .gallery .thumbs div { width:42px; height:42px; background: var(--plum-50); border:1px solid var(--line); border-radius:6px; }
+  .detail .info { flex:1; }
+  .detail .info h4 { margin:0 0 4px; font-size:17px; }
+  .detail .info .price { font-size:20px; font-weight:700; color: var(--plum-700); margin:8px 0; }
+  .seller-card { border:1px solid var(--line); border-radius:10px; padding:12px; margin:12px 0; background: var(--plum-50); }
+  .seller-card .srow { display:flex; align-items:center; gap:10px; }
+  .seller-card .avatar { width:38px; height:38px; border-radius:50%; background: linear-gradient(135deg,var(--plum-500),var(--gold)); }
+  .seller-card .sname { font-weight:700; font-size:13px; }
+  .seller-card .badges { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
+  .seller-card .bdg { font-size:10px; background:#fff; border:1px solid var(--line); padding:2px 8px; border-radius:999px; color: var(--plum-600); font-weight:600; }
+  .seller-card .bdg.verified { background: var(--ok-bg); color: var(--ok); border-color:#bfe2cd; }
+  .actions { display:flex; gap:8px; margin-top:12px; }
+  .reviews { padding:0 18px 18px; }
+  .reviews h5 { font-family: Georgia, serif; color: var(--plum-700); margin:0 0 10px; font-size:14px; }
+  .review { border-top:1px solid var(--line); padding:10px 0; font-size:12px; color:#574e57; }
+  .review .rh { display:flex; justify-content:space-between; margin-bottom:3px; }
+  .review .who { font-weight:600; color:var(--ink); }
+
+  /* Dashboard vendedor */
+  .dash { display:flex; min-height: 320px; }
+  .dash .side { width:160px; background: var(--plum-800); color:#f0e4ed; padding:16px 0; }
+  .dash .side .si { padding:9px 18px; font-size:12px; color:#d9c5d3; display:flex; gap:9px; align-items:center; }
+  .dash .side .si.on { background: rgba(255,255,255,.12); color:#fff; border-left:3px solid var(--gold); font-weight:600; }
+  .dash .main { flex:1; padding:18px; background: var(--bg); }
+  .kpis { display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:16px; }
+  .kpi { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+  .kpi .k { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color: var(--muted); }
+  .kpi .v { font-size:20px; font-weight:700; color: var(--plum-700); font-family: Georgia, serif; }
+  .kpi .d { font-size:10.5px; color: var(--ok); }
+  .panel { background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .panel .ptitle { padding:10px 14px; font-weight:700; font-size:12.5px; border-bottom:1px solid var(--line); color: var(--ink); }
+  .minitable { width:100%; border-collapse:collapse; font-size:11.5px; min-width:0; }
+  .minitable th { background:#faf5f8; text-align:left; padding:7px 14px; color: var(--muted); font-weight:600; border-bottom:1px solid var(--line); }
+  .minitable td { padding:7px 14px; border-bottom:1px solid var(--line); color:#574e57; }
+  .st { font-size:10px; padding:2px 7px; border-radius:999px; font-weight:700; }
+  .st.ok { background: var(--ok-bg); color: var(--ok); }
+  .st.pend { background:#fbf1dd; color: var(--gold); }
+
+  /* ===== Roadmap ===== */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before { content:""; position:absolute; left:7px; top:6px; bottom:6px; width:2px; background: var(--plum-300); }
+  .ti { position: relative; margin-bottom: 22px; }
+  .ti::before { content:""; position:absolute; left:-28px; top:4px; width:16px; height:16px; border-radius:50%; background: var(--plum-500); border:3px solid #fff; box-shadow:0 0 0 1px var(--plum-300); }
+  .ti h4 { margin:0 0 4px; color: var(--plum-700); font-size:1.05rem; }
+  .ti .wk { font-size:.74rem; text-transform:uppercase; letter-spacing:.08em; color: var(--gold); font-weight:700; }
+  .ti p { margin:3px 0 0; font-size:.93rem; color:#463d45; }
+
+  footer { background: var(--plum-950); color:#cdb9c6; padding: 30px 0; text-align:center; font-size:.84rem; }
+  footer a { color: var(--gold-soft); }
+
+  @media (max-width: 820px){
+    .grid-2,.grid-3,.kpis,.pgrid{ grid-template-columns: 1fr 1fr; }
+    .shop{ flex-direction:column; } .shop .filters{ width:auto; border-right:none; border-bottom:1px solid var(--line); }
+    .detail{ flex-direction:column; } .detail .gallery{ width:auto; }
+    .dash .side{ width:64px; } .dash .side .si span:last-child{ display:none; }
+    header h1{ font-size:2rem; }
+  }
+  @media (max-width: 540px){
+    .grid-2,.grid-3,.kpis,.pgrid{ grid-template-columns: 1fr; }
+    .arch .arrow{ transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<div class="topnav">
+  <div class="wrap topnav-top">
+    <a class="brand" href="#top"><span class="badge-dot"></span> Marketplace Artesanal · TFM</a>
+    <a class="back" href="Opciones-TFM-Ecommerce.html">← Todas las opciones</a>
+  </div>
+  <nav class="wrap section-nav">
+    <a href="#concepto">Concepto</a>
+    <a href="#actores">Actores</a>
+    <a href="#arquitectura">Arquitectura</a>
+    <a href="#datos">Modelo de datos</a>
+    <a href="#seguridad">Seguridad</a>
+    <a href="#reputacion">Reputación</a>
+    <a href="#diseno">Diseño</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="Marketplace-Prototipo.html" style="color:var(--plum-600); font-weight:700;">▸ Prototipo</a>
+  </nav>
+</div>
+
+<header id="top">
+  <div class="wrap">
+    <p class="eyebrow">Propuesta desarrollada · Opción 3</p>
+    <h1>Marketplace de Productos Artesanales</h1>
+    <p>Una plataforma multivendedor donde cada usuario puede comprar y, si lo desea, abrir su propia tienda para vender piezas hechas a mano. El TFM gira en torno a la <em>seguridad por roles</em> y a un <em>sistema de reputación y confianza</em> entre desconocidos.</p>
+    <div class="chips">
+      <span class="chip">Spring Boot · API REST</span>
+      <span class="chip">Spring Security · RBAC + JWT</span>
+      <span class="chip">Spring Data JPA · MySQL</span>
+      <span class="chip">MongoDB (eventos)</span>
+      <span class="chip">Angular · Guards · Reactive Forms</span>
+      <span class="chip">JUnit · Karma · Docker</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== CONCEPTO ===== -->
+<section id="concepto">
+  <div class="wrap">
+    <p class="kicker">El qué y el porqué</p>
+    <h2 class="sec">Concepto y propuesta de valor</h2>
+    <p class="sec-lead">Pensemos en algo tipo <strong>Etsy</strong> a pequeña escala: artesanos (cerámica, joyería, cuero, ilustración…) publican sus productos y los compradores los descubren, valoran y "adquieren" mediante un checkout simulado. La diferencia clave frente a una tienda normal es que <strong>el mismo usuario puede ejercer dos papeles</strong> y que la confianza no la da una gran marca, sino la reputación de cada pequeño vendedor.</p>
+
+    <div class="grid-3">
+      <div class="box">
+        <h3><span class="ico">◆</span>El problema</h3>
+        <p>En una tienda de un solo dueño, la confianza es implícita. En un marketplace, ¿cómo confío en un vendedor que no conozco? Ese es el reto que da sustancia al TFM.</p>
+      </div>
+      <div class="box">
+        <h3><span class="ico">◆</span>La solución</h3>
+        <p>Roles bien definidos, verificación de vendedores, valoraciones honestas e insignias por trayectoria. La plataforma "fabrica" confianza mediante software.</p>
+      </div>
+      <div class="box">
+        <h3><span class="ico">◆</span>Por qué como TFM</h3>
+        <p>Obliga a usar Spring Security a fondo, a modelar datos no triviales y a tomar decisiones de arquitectura defendibles en la memoria.</p>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <p><strong>Sin pagos reales.</strong> El checkout es simulado (se genera un pedido con estado <code>PENDIENTE → PAGADO → ENVIADO → ENTREGADO</code>), igual que recomienda tu profesor. Toda la complejidad interesante (roles, stock, reputación, pedidos) se mantiene; solo se omite la pasarela de pago real.</p>
+    </div>
+
+    <h3 style="color:var(--plum-700); margin-top:34px;">Objetivos del proyecto (orientados a tu CV)</h3>
+    <div class="grid-2" style="margin-top:14px;">
+      <div class="box">
+        <ul>
+          <li>Demostrar <strong>autorización por roles</strong> (RBAC) con Spring Security, JWT y <code>@PreAuthorize</code>.</li>
+          <li>Diseñar un <strong>modelo de datos relacional</strong> realista con relaciones 1:N y N:N.</li>
+          <li>Construir una <strong>SPA en Angular</strong> con guards, resolvers, interceptores y formularios reactivos.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <ul>
+          <li>Implementar un <strong>sistema de reputación</strong> con justificación teórica (el "twist").</li>
+          <li>Cubrir <strong>tests</strong> en backend (JUnit/Mockito) y frontend (Jasmine/Karma).</li>
+          <li>Entregar un <strong>despliegue reproducible</strong> con Docker Compose y CI básico.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ACTORES ===== -->
+<section id="actores">
+  <div class="wrap">
+    <p class="kicker">Quién usa la plataforma</p>
+    <h2 class="sec">Actores y roles</h2>
+    <p class="sec-lead">El corazón del proyecto. Cada rol ve una aplicación distinta, con endpoints y pantallas protegidas. Un usuario nace como <code>COMPRADOR</code> y puede "darse de alta como vendedor", lo que le añade el rol <code>VENDEDOR</code> (los roles son acumulables).</p>
+
+    <div class="grid-3">
+      <div class="box role buyer">
+        <span class="tag">ROLE_BUYER</span>
+        <h3>Comprador</h3>
+        <p>El rol por defecto al registrarse.</p>
+        <ul>
+          <li>Explora el catálogo y filtra productos.</li>
+          <li>Gestiona carrito y checkout simulado.</li>
+          <li>Ve su histórico de pedidos.</li>
+          <li>Deja reseñas y valoraciones de lo comprado.</li>
+          <li>Gestiona su wishlist.</li>
+        </ul>
+      </div>
+      <div class="box role seller">
+        <span class="tag">ROLE_SELLER</span>
+        <h3>Vendedor</h3>
+        <p>Comprador que abre su tienda.</p>
+        <ul>
+          <li>CRUD de sus propios productos y stock.</li>
+          <li>Panel con métricas (ventas, valoración media).</li>
+          <li>Gestiona los pedidos que recibe.</li>
+          <li>Responde a reseñas.</li>
+          <li><strong>Solo puede tocar lo suyo</strong> (regla de propiedad).</li>
+        </ul>
+      </div>
+      <div class="box role admin">
+        <span class="tag">ROLE_ADMIN</span>
+        <h3>Administrador</h3>
+        <p>Modera y mantiene la plataforma.</p>
+        <ul>
+          <li>Verifica y aprueba vendedores.</li>
+          <li>Gestiona categorías globales.</li>
+          <li>Modera reseñas y productos reportados.</li>
+          <li>Suspende cuentas fraudulentas.</li>
+          <li>Acceso total al backoffice.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <p><strong>La "regla de propiedad" es el reto fino.</strong> No basta con que un usuario tenga rol <code>VENDEDOR</code> para editar un producto: debe ser <em>su</em> producto. Eso obliga a seguridad a nivel de método/instancia (más allá del rol), un punto perfecto para lucir en la memoria.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ARQUITECTURA ===== -->
+<section id="arquitectura">
+  <div class="wrap">
+    <p class="kicker">Cómo se construye</p>
+    <h2 class="sec">Arquitectura de alto nivel</h2>
+    <p class="sec-lead">Arquitectura clásica de tres capas desacopladas: una SPA en Angular que consume una API REST en Spring Boot, que a su vez persiste en una base de datos relacional. Una colección NoSQL opcional almacena eventos para analítica.</p>
+
+    <div class="arch">
+      <div class="layer">
+        <h4>① Cliente · Angular SPA</h4>
+        <div class="sub">Lo que ve el usuario en el navegador</div>
+        <div class="pillrow">
+          <span class="mini">Components</span><span class="mini">Router + Guards</span>
+          <span class="mini">Reactive Forms</span><span class="mini">RxJS</span>
+          <span class="mini">HttpClient + Interceptor JWT</span><span class="mini">SCSS/SASS</span>
+        </div>
+      </div>
+      <div class="arrow">⇄</div>
+      <div class="layer">
+        <h4>② API REST · Spring Boot</h4>
+        <div class="sub">Controladores → Servicios → Repositorios</div>
+        <div class="pillrow">
+          <span class="mini">Spring Web</span><span class="mini">Spring Security (JWT)</span>
+          <span class="mini">Spring Data JPA</span><span class="mini">Bean Validation</span>
+          <span class="mini">@PreAuthorize</span><span class="mini">Swagger/OpenAPI</span>
+        </div>
+      </div>
+      <div class="arrow">⇄</div>
+      <div class="layer">
+        <h4>③ Persistencia</h4>
+        <div class="sub">Datos del dominio + eventos</div>
+        <div class="pillrow">
+          <span class="mini">MySQL (dominio)</span><span class="mini">H2 (tests)</span>
+          <span class="mini">MongoDB (eventos, opcional)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:26px;">
+      <div class="box">
+        <h3><span class="ico">▸</span>Flujo de una petición protegida</h3>
+        <p>El usuario hace login → recibe un <strong>JWT</strong> → Angular lo guarda y un <strong>interceptor</strong> lo adjunta en cada petición → Spring Security valida el token, extrae roles y aplica <code>@PreAuthorize</code> → el servicio comprueba además la propiedad del recurso.</p>
+      </div>
+      <div class="box">
+        <h3><span class="ico">▸</span>Decisiones clave (tradeoffs)</h3>
+        <ul>
+          <li><strong>Monolito modular</strong> y no microservicios: alcance realista para un TFM, más fácil de defender.</li>
+          <li><strong>MySQL</strong> para el dominio transaccional; <strong>MongoDB</strong> solo para eventos (clics/búsquedas).</li>
+          <li><strong>JWT stateless</strong> frente a sesiones: encaja con SPA + REST.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MODELO DE DATOS ===== -->
+<section id="datos">
+  <div class="wrap">
+    <p class="kicker">El dominio</p>
+    <h2 class="sec">Modelo de datos (borrador)</h2>
+    <p class="sec-lead">Entidades principales y sus relaciones. La tabla <code>Reputacion</code> (en dorado) es la que materializa el twist del proyecto.</p>
+
+    <div class="erd">
+      <div class="entity">
+        <div class="ehead">User</div>
+        <ul>
+          <li><span>id</span><span class="pk">PK</span></li>
+          <li><span>email</span></li>
+          <li><span>passwordHash</span></li>
+          <li><span>nombre</span></li>
+          <li><span>roles[]</span></li>
+        </ul>
+      </div>
+      <div class="entity">
+        <div class="ehead">Shop (tienda)</div>
+        <ul>
+          <li><span>id</span><span class="pk">PK</span></li>
+          <li><span>ownerId</span><span class="fk">FK→User</span></li>
+          <li><span>nombre</span></li>
+          <li><span>descripcion</span></li>
+          <li><span>verificada</span></li>
+        </ul>
+      </div>
+      <div class="entity">
+        <div class="ehead">Product</div>
+        <ul>
+          <li><span>id</span><span class="pk">PK</span></li>
+          <li><span>shopId</span><span class="fk">FK→Shop</span></li>
+          <li><span>categoriaId</span><span class="fk">FK</span></li>
+          <li><span>titulo · precio</span></li>
+          <li><span>stock · imagenes[]</span></li>
+        </ul>
+      </div>
+      <div class="entity">
+        <div class="ehead">Category</div>
+        <ul>
+          <li><span>id</span><span class="pk">PK</span></li>
+          <li><span>nombre</span></li>
+          <li><span>slug</span></li>
+        </ul>
+      </div>
+      <div class="entity">
+        <div class="ehead">Order</div>
+        <ul>
+          <li><span>id</span><span class="pk">PK</span></li>
+          <li><span>buyerId</span><span class="fk">FK→User</span></li>
+          <li><span>estado</span></li>
+          <li><span>total · fecha</span></li>
+        </ul>
+      </div>
+      <div class="entity">
+        <div class="ehead">OrderItem</div>
+        <ul>
+          <li><span>id</span><span class="pk">PK</span></li>
+          <li><span>orderId</span><span class="fk">FK→Order</span></li>
+          <li><span>productId</span><span class="fk">FK</span></li>
+          <li><span>precio · cantidad</span></li>
+        </ul>
+      </div>
+      <div class="entity">
+        <div class="ehead">Review</div>
+        <ul>
+          <li><span>id</span><span class="pk">PK</span></li>
+          <li><span>buyerId</span><span class="fk">FK</span></li>
+          <li><span>productId</span><span class="fk">FK</span></li>
+          <li><span>rating (1-5)</span></li>
+          <li><span>comentario · fecha</span></li>
+        </ul>
+      </div>
+      <div class="entity key">
+        <div class="ehead">Reputacion</div>
+        <ul>
+          <li><span>shopId</span><span class="fk">FK→Shop</span></li>
+          <li><span>score (0-100)</span></li>
+          <li><span>nVentas</span></li>
+          <li><span>ratingMedio</span></li>
+          <li><span>insignias[]</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <ul class="rel-list">
+      <li>▸ <strong>User 1:1 Shop</strong> — un usuario tiene como mucho una tienda (al hacerse vendedor).</li>
+      <li>▸ <strong>Shop 1:N Product</strong> — una tienda publica muchos productos.</li>
+      <li>▸ <strong>Category 1:N Product</strong> — cada producto pertenece a una categoría.</li>
+      <li>▸ <strong>User (buyer) 1:N Order 1:N OrderItem</strong> — un comprador hace pedidos con varias líneas.</li>
+      <li>▸ <strong>User 1:N Review N:1 Product</strong> — un comprador valora productos que ha comprado.</li>
+      <li>▸ <strong>Shop 1:1 Reputacion</strong> — agregado calculado a partir de ventas y reseñas.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== SEGURIDAD ===== -->
+<section id="seguridad">
+  <div class="wrap">
+    <p class="kicker">El núcleo técnico</p>
+    <h2 class="sec">Seguridad y autorización (RBAC)</h2>
+    <p class="sec-lead">Aquí es donde el proyecto demuestra dominio del Tema 8. Cada endpoint declara qué rol puede usarlo, y los endpoints de modificación añaden además una comprobación de <em>propiedad del recurso</em>.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Endpoint</th><th>Método</th><th>Acceso</th><th>Comprobación extra</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>/api/products</td><td>GET</td><td><span class="roletag rt-pub">PÚBLICO</span></td><td>—</td></tr>
+          <tr><td>/api/auth/register · login</td><td>POST</td><td><span class="roletag rt-pub">PÚBLICO</span></td><td>—</td></tr>
+          <tr><td>/api/cart · /api/checkout</td><td>POST</td><td><span class="roletag rt-buyer">BUYER</span></td><td>—</td></tr>
+          <tr><td>/api/me/orders</td><td>GET</td><td><span class="roletag rt-buyer">BUYER</span></td><td>Solo sus pedidos</td></tr>
+          <tr><td>/api/products/{id}/reviews</td><td>POST</td><td><span class="roletag rt-buyer">BUYER</span></td><td>Solo si lo compró</td></tr>
+          <tr><td>/api/seller/products</td><td>POST</td><td><span class="roletag rt-seller">SELLER</span></td><td>—</td></tr>
+          <tr><td>/api/seller/products/{id}</td><td>PUT · DELETE</td><td><span class="roletag rt-seller">SELLER</span></td><td><strong>Producto de su tienda</strong></td></tr>
+          <tr><td>/api/admin/shops/{id}/verify</td><td>POST</td><td><span class="roletag rt-admin">ADMIN</span></td><td>—</td></tr>
+          <tr><td>/api/admin/users/{id}/suspend</td><td>POST</td><td><span class="roletag rt-admin">ADMIN</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2" style="margin-top:24px;">
+      <div class="box">
+        <h3><span class="ico">▸</span>En el backend</h3>
+        <ul>
+          <li><code>SecurityFilterChain</code> con filtro JWT propio.</li>
+          <li><code>@PreAuthorize("hasRole('SELLER')")</code> a nivel de método.</li>
+          <li>Comprobación de propiedad en el servicio (<em>el producto es de la tienda del usuario autenticado</em>).</li>
+          <li>CORS configurado y manejo global de errores 401/403.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3><span class="ico">▸</span>En el frontend</h3>
+        <ul>
+          <li><strong>Guards</strong> (<code>CanActivate</code>) que protegen rutas por rol.</li>
+          <li><strong>Interceptor</strong> que adjunta el JWT y redirige al login en 401.</li>
+          <li>Menús y botones que se muestran/ocultan según el rol.</li>
+          <li>Lazy loading del módulo de vendedor y del backoffice.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REPUTACIÓN (TWIST) ===== -->
+<section id="reputacion">
+  <div class="wrap">
+    <p class="kicker">El diferenciador · enfoque teórico</p>
+    <h2 class="sec">Sistema de reputación y confianza</h2>
+    <p class="sec-lead">Este es el capítulo que convierte un e-commerce en un TFM. La pregunta de investigación: <strong>¿cómo genera confianza una plataforma entre dos desconocidos?</strong> Se estudia la teoría, se diseña un modelo propio y se compara con plataformas reales.</p>
+
+    <div class="grid-3">
+      <div class="box">
+        <h3><span class="ico">①</span>Marco teórico</h3>
+        <p>Revisión de los mecanismos de confianza online: valoraciones, reseñas, verificación de identidad, insignias y señales de trayectoria. Cómo cada uno reduce la <em>asimetría de información</em> entre comprador y vendedor.</p>
+      </div>
+      <div class="box">
+        <h3><span class="ico">②</span>Modelo propio</h3>
+        <p>Un <strong>score de reputación (0-100)</strong> por tienda, combinando valoración media, número de ventas completadas, antigüedad y tasa de incidencias. Pesos configurables y justificados.</p>
+      </div>
+      <div class="box">
+        <h3><span class="ico">③</span>Análisis comparativo</h3>
+        <p>Comparar tu modelo con los de <strong>eBay, Wallapop, Etsy y Stack Overflow</strong>: ¿qué señales usan?, ¿cómo previenen el fraude y las reseñas falsas?, ¿qué incentivos crean?</p>
+      </div>
+    </div>
+
+    <h3 style="color:var(--plum-700); margin-top:30px;">Fórmula de ejemplo (a defender en la memoria)</h3>
+    <div class="formula">
+<span class="c">// Score de reputación de una tienda (0-100)</span><br>
+score = <span class="v">0.40</span> · ratingMedioNorm   <span class="c">// calidad percibida (reseñas)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="v">0.30</span> · volumenVentasNorm  <span class="c">// trayectoria (ventas completadas)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="v">0.20</span> · antiguedadNorm     <span class="c">// veteranía en la plataforma</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="v">0.10</span> · tasaIncidencias    <span class="c">// penalización por disputas</span>
+    </div>
+
+    <div class="grid-2" style="margin-top:8px;">
+      <div class="box">
+        <h3><span class="ico">▸</span>Insignias (gamificación de la confianza)</h3>
+        <ul>
+          <li><strong>Vendedor verificado</strong> — identidad aprobada por un admin.</li>
+          <li><strong>Artesano destacado</strong> — score &gt; 85 sostenido.</li>
+          <li><strong>Respuesta rápida</strong> — atiende pedidos en &lt; 24 h.</li>
+          <li><strong>100 ventas</strong> — hito de trayectoria.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3><span class="ico">▸</span>Prevención de fraude</h3>
+        <ul>
+          <li>Solo puede reseñar <strong>quien ha comprado</strong> (reseña verificada).</li>
+          <li>Una reseña por comprador y producto.</li>
+          <li>Detección de patrones sospechosos (muchas 5★ del mismo usuario).</li>
+          <li>Moderación por parte del admin de reseñas reportadas.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <p><strong>Conexión con el temario:</strong> el cálculo del score puede hacerse <em>on-read</em> (al consultar) o mediante <em>tareas programadas</em>, y los eventos que lo alimentan (ventas, reseñas) son un caso ideal para el <strong>Aggregation Pipeline de MongoDB</strong> (Tema 10). La verificación "solo compradores reseñan" ejercita las <strong>transacciones y relaciones JPA</strong> (Tema 7).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DISEÑO / MOCKUPS ===== -->
+<section id="diseno">
+  <div class="wrap">
+    <p class="kicker">Borrador visual · no es el diseño final</p>
+    <h2 class="sec">Diseño de las pantallas clave</h2>
+    <p class="sec-lead">Mockups de baja-media fidelidad para hacernos una idea del producto. Mantienen la identidad berenjena y muestran las tres vistas más representativas: el marketplace, la ficha de producto (con la reputación del vendedor) y el panel del vendedor.</p>
+
+    <div class="note-box" style="display:flex; align-items:center; gap:18px; flex-wrap:wrap; justify-content:space-between;">
+      <p style="flex:1; min-width:260px;">🖐️ <strong>¿Quieres tocarlo?</strong> He preparado un <strong>prototipo interactivo</strong> con todas las pantallas: puedes añadir al carrito, guardar favoritos, filtrar, valorar con estrellas y cambiar el estado de pedidos. Solo visual, sin backend.</p>
+      <a href="Marketplace-Prototipo.html" style="display:inline-flex; align-items:center; background:var(--plum-600); color:#fff; text-decoration:none; padding:12px 22px; border-radius:10px; font-weight:600; white-space:nowrap; box-shadow:var(--shadow);">Abrir prototipo interactivo&nbsp;→</a>
+    </div>
+
+    <!-- MOCKUP 1: Marketplace -->
+    <div class="browser">
+      <div class="bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="url">artesania.app/explorar</span></div>
+      <div class="app">
+        <div class="appbar">
+          <div class="logo"><span class="sq"></span> Artesanía</div>
+          <div class="search">🔍  Buscar productos, tiendas, categorías…</div>
+          <div class="navicons">♡ &nbsp; 🛒 &nbsp; 👤</div>
+          <button class="btn ghost">Vender</button>
+        </div>
+        <div class="pillnav">
+          <span class="on">Todo</span><span>Cerámica</span><span>Joyería</span><span>Cuero</span><span>Ilustración</span><span>Textil</span><span>Madera</span>
+        </div>
+        <div class="shop">
+          <div class="filters">
+            <h5>Categoría</h5>
+            <div class="f"><span class="ck on"></span> Cerámica</div>
+            <div class="f"><span class="ck"></span> Joyería</div>
+            <div class="f"><span class="ck"></span> Cuero</div>
+            <hr>
+            <h5>Precio</h5>
+            <div class="f"><span class="ck"></span> &lt; 20 €</div>
+            <div class="f"><span class="ck on"></span> 20 – 50 €</div>
+            <div class="f"><span class="ck"></span> &gt; 50 €</div>
+            <hr>
+            <h5>Valoración</h5>
+            <div class="f"><span class="stars">★★★★</span>☆ y más</div>
+            <div class="f"><span class="ck on"></span> Solo verificados</div>
+          </div>
+          <div class="results">
+            <div class="pgrid">
+              <div class="pcard"><div class="ph">imagen</div><div class="pb"><div class="pt">Taza esmaltada azul</div><div class="pseller">Cerámica Lola ✓</div><div class="prow"><span class="price">24 €</span><span class="rate">★ 4.9</span></div></div></div>
+              <div class="pcard"><div class="ph">imagen</div><div class="pb"><div class="pt">Collar de plata hoja</div><div class="pseller">JoyaViva</div><div class="prow"><span class="price">38 €</span><span class="rate">★ 4.7</span></div></div></div>
+              <div class="pcard"><div class="ph">imagen</div><div class="pb"><div class="pt">Cartera de cuero</div><div class="pseller">Tallereta ✓</div><div class="prow"><span class="price">45 €</span><span class="rate">★ 5.0</span></div></div></div>
+              <div class="pcard"><div class="ph">imagen</div><div class="pb"><div class="pt">Lámina acuarela</div><div class="pseller">Estudio Nim</div><div class="prow"><span class="price">22 €</span><span class="rate">★ 4.6</span></div></div></div>
+              <div class="pcard"><div class="ph">imagen</div><div class="pb"><div class="pt">Cuenco de gres</div><div class="pseller">Cerámica Lola ✓</div><div class="prow"><span class="price">30 €</span><span class="rate">★ 4.8</span></div></div></div>
+              <div class="pcard"><div class="ph">imagen</div><div class="pb"><div class="pt">Pendientes arcilla</div><div class="pseller">TierraFina</div><div class="prow"><span class="price">19 €</span><span class="rate">★ 4.5</span></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="mock-cap"><b>Pantalla 1 · Marketplace.</b> Barra de búsqueda, filtros por categoría/precio/valoración, y rejilla de productos con vendedor, precio y rating. El check "✓" marca tiendas verificadas.</p>
+
+    <!-- MOCKUP 2: Ficha producto -->
+    <div class="browser">
+      <div class="bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="url">artesania.app/producto/taza-esmaltada-azul</span></div>
+      <div class="app">
+        <div class="appbar">
+          <div class="logo"><span class="sq"></span> Artesanía</div>
+          <div class="search">🔍  Buscar…</div>
+          <div class="navicons">♡ &nbsp; 🛒 &nbsp; 👤</div>
+        </div>
+        <div class="detail">
+          <div class="gallery">
+            <div class="big">imagen principal</div>
+            <div class="thumbs"><div></div><div></div><div></div></div>
+          </div>
+          <div class="info">
+            <h4>Taza esmaltada azul cobalto</h4>
+            <div style="color:var(--muted); font-size:12px;">Cerámica · hecha a mano · 300 ml</div>
+            <div class="price">24,00 €</div>
+            <div style="font-size:12px; color:var(--ok);">● En stock (7 unidades)</div>
+
+            <div class="seller-card">
+              <div class="srow">
+                <div class="avatar"></div>
+                <div>
+                  <div class="sname">Cerámica Lola</div>
+                  <div style="font-size:11px; color:var(--gold);">★ 4.9 · Reputación 92/100</div>
+                </div>
+              </div>
+              <div class="badges">
+                <span class="bdg verified">✓ Verificado</span>
+                <span class="bdg">Artesano destacado</span>
+                <span class="bdg">+100 ventas</span>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn">Añadir al carrito</button>
+              <button class="btn ghost">♡ Guardar</button>
+            </div>
+          </div>
+        </div>
+        <div class="reviews">
+          <h5>Reseñas verificadas (38)</h5>
+          <div class="review"><div class="rh"><span class="who">María G. <span style="color:var(--ok); font-size:10px;">✓ compra verificada</span></span><span style="color:var(--gold);">★★★★★</span></div>Preciosa y muy bien embalada. Repetiré sin duda.</div>
+          <div class="review"><div class="rh"><span class="who">Javier R. <span style="color:var(--ok); font-size:10px;">✓ compra verificada</span></span><span style="color:var(--gold);">★★★★☆</span></div>El color es algo más oscuro que en la foto, pero la calidad es excelente.</div>
+        </div>
+      </div>
+    </div>
+    <p class="mock-cap"><b>Pantalla 2 · Ficha de producto.</b> Galería, datos, stock y —lo importante— la <b>tarjeta del vendedor con su reputación e insignias</b>. Las reseñas marcan "compra verificada".</p>
+
+    <!-- MOCKUP 3: Dashboard vendedor -->
+    <div class="browser">
+      <div class="bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="url">artesania.app/vendedor/panel</span></div>
+      <div class="app">
+        <div class="dash">
+          <div class="side">
+            <div class="si on">▦ <span>Resumen</span></div>
+            <div class="si">📦 <span>Mis productos</span></div>
+            <div class="si">🧾 <span>Pedidos</span></div>
+            <div class="si">★ <span>Reseñas</span></div>
+            <div class="si">🏪 <span>Mi tienda</span></div>
+          </div>
+          <div class="main">
+            <div style="font-family:Georgia,serif; color:var(--plum-700); font-size:16px; margin-bottom:12px;">Hola, Cerámica Lola 👋</div>
+            <div class="kpis">
+              <div class="kpi"><div class="k">Ventas (mes)</div><div class="v">1.240 €</div><div class="d">▲ 12%</div></div>
+              <div class="kpi"><div class="k">Pedidos</div><div class="v">28</div><div class="d">▲ 4</div></div>
+              <div class="kpi"><div class="k">Valoración</div><div class="v">4.9</div><div class="d">38 reseñas</div></div>
+              <div class="kpi"><div class="k">Reputación</div><div class="v">92</div><div class="d">Top 10%</div></div>
+            </div>
+            <div class="panel">
+              <div class="ptitle">Últimos pedidos</div>
+              <table class="minitable">
+                <thead><tr><th>Pedido</th><th>Producto</th><th>Comprador</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <tr><td>#1042</td><td>Taza esmaltada azul</td><td>María G.</td><td><span class="st pend">Pendiente envío</span></td></tr>
+                  <tr><td>#1041</td><td>Cuenco de gres</td><td>Javier R.</td><td><span class="st ok">Entregado</span></td></tr>
+                  <tr><td>#1039</td><td>Taza esmaltada azul</td><td>Lucía P.</td><td><span class="st ok">Entregado</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="mock-cap"><b>Pantalla 3 · Panel del vendedor.</b> Vista que solo ve el rol <b>SELLER</b>: KPIs de su tienda, gestión de pedidos y acceso a sus productos. El admin tendría un backoffice equivalente pero global.</p>
+
+    <h3 style="color:var(--plum-700); margin-top:8px;">Notas de diseño</h3>
+    <div class="grid-3">
+      <div class="box"><h3><span class="ico">▸</span>Identidad</h3><p>Paleta berenjena + acento dorado, tipografía serif para títulos y sans para interfaz. Transmite artesanía cuidada y cercana.</p></div>
+      <div class="box"><h3><span class="ico">▸</span>Responsive</h3><p>Mobile-first: la rejilla pasa a una columna, los filtros se colapsan y la barra lateral del panel se reduce a iconos.</p></div>
+      <div class="box"><h3><span class="ico">▸</span>Componentes Angular</h3><p>Cada bloque (card de producto, tarjeta de vendedor, tabla de pedidos) es un componente reutilizable con <code>@Input</code>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ROADMAP ===== -->
+<section id="roadmap">
+  <div class="wrap">
+    <p class="kicker">Cómo abordarlo</p>
+    <h2 class="sec">Roadmap orientativo (M0 → M3)</h2>
+    <p class="sec-lead">Una posible planificación en cuatro hitos. La idea es tener algo funcional pronto y dejar el twist de reputación y los tests para el final, cuando el dominio ya es estable.</p>
+
+    <div class="timeline">
+      <div class="ti">
+        <span class="wk">Semana 1 · M0 — Cimientos</span>
+        <h4>Setup y autenticación</h4>
+        <p>Proyecto Spring Boot + Angular, Docker Compose (api + MySQL), entidad <code>User</code>, registro/login con JWT y los guards básicos en Angular. Objetivo: poder registrarse e iniciar sesión.</p>
+      </div>
+      <div class="ti">
+        <span class="wk">Semanas 2-3 · M1 — Catálogo y tiendas</span>
+        <h4>Productos, categorías y rol vendedor</h4>
+        <p>CRUD de productos, alta como vendedor (tienda), explorador con filtros, fichas de producto. Aquí se materializa la seguridad por roles y la regla de propiedad.</p>
+      </div>
+      <div class="ti">
+        <span class="wk">Semana 4 · M2 — Compra y reseñas</span>
+        <h4>Carrito, checkout simulado y valoraciones</h4>
+        <p>Carrito, pedido con estados, histórico del comprador, panel del vendedor con sus pedidos, y reseñas verificadas (solo quien compró).</p>
+      </div>
+      <div class="ti">
+        <span class="wk">Semanas 5-6 · M3 — Twist + calidad</span>
+        <h4>Reputación, tests y memoria</h4>
+        <p>Sistema de reputación con su score e insignias, panel de admin (verificar vendedores, moderar), batería de tests (JUnit + Karma), CI y redacción del análisis comparativo de la memoria.</p>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <p><strong>Consejo:</strong> valida este alcance con tu tutor antes de empezar. El marketplace es ambicioso; si vas justo de tiempo, una buena estrategia es <em>recortar el panel de admin a lo mínimo</em> (verificar vendedores) y concentrar el esfuerzo en el sistema de reputación, que es lo que da valor académico.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Desarrollo de la propuesta · Marketplace Artesanal · TFM Máster Full Stack Developer<br>
+    <a href="Opciones-TFM-Ecommerce.html">← Volver a todas las opciones</a>
+  </div>
+</footer>
+
+<script>
+  // Scrollspy: resalta la pestaña de la sección visible
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('.section-nav a'));
+    var sections = links
+      .map(function (a) { return document.querySelector(a.getAttribute('href')); })
+      .filter(Boolean);
+
+    function setActive(id) {
+      links.forEach(function (a) {
+        var on = a.getAttribute('href') === '#' + id;
+        a.classList.toggle('active', on);
+        if (on && a.scrollIntoView) {
+          // mantiene visible la pestaña activa en el scroll horizontal (móvil)
+          a.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+        }
+      });
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    }, { rootMargin: '-120px 0px -65% 0px', threshold: 0 });
+
+    sections.forEach(function (s) { observer.observe(s); });
+  })();
+</script>
+
+</body>
+</html>

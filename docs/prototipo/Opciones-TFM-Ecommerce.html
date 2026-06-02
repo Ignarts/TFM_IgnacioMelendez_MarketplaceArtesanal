@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opciones TFM · E-commerce · Máster Full Stack</title>
+<style>
+  /* ===== Paleta berenjena · modo claro ===== */
+  :root {
+    --plum-950: #2a1226;
+    --plum-800: #45203d;
+    --plum-700: #5b2a4e;
+    --plum-600: #6e3260;
+    --plum-500: #8a4178;
+    --plum-300: #c79ebb;
+    --plum-100: #f4e9f1;
+    --plum-50:  #faf5f8;
+
+    --gold:     #b9883b;
+    --gold-soft:#e8d4a8;
+
+    --ink:      #241c22;
+    --muted:    #6f6470;
+    --line:     #ebe0e8;
+    --bg:       #fbf8fa;
+    --card:     #ffffff;
+
+    --ok:       #2f7a55;
+    --ok-bg:    #e6f3ec;
+    --no:       #a8424b;
+    --no-bg:    #f7e7e8;
+
+    --shadow:   0 1px 2px rgba(42,18,38,.04), 0 8px 24px rgba(42,18,38,.06);
+    --radius:   16px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; line-height: 1.2; }
+
+  /* ===== Layout ===== */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== Header / hero ===== */
+  header {
+    background: linear-gradient(135deg, var(--plum-800) 0%, var(--plum-600) 60%, var(--plum-500) 100%);
+    color: #fff;
+    padding: 64px 0 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: "";
+    position: absolute; right: -80px; top: -80px;
+    width: 320px; height: 320px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.12), transparent 70%);
+  }
+  header .eyebrow {
+    text-transform: uppercase; letter-spacing: .18em; font-size: .72rem;
+    color: var(--gold-soft); font-weight: 600; margin: 0 0 12px;
+  }
+  header h1 { font-size: 2.6rem; margin: 0 0 14px; max-width: 760px; }
+  header p { font-size: 1.08rem; color: #f0e4ed; max-width: 680px; margin: 0; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+  .chip {
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22);
+    color: #fff; padding: 5px 12px; border-radius: 999px; font-size: .8rem; font-weight: 500;
+    backdrop-filter: blur(2px);
+  }
+
+  /* ===== Intro / criterios ===== */
+  section.intro { padding: 48px 0 8px; }
+  .note-box {
+    background: var(--plum-50);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--gold);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+  .note-box h3 { margin: 0 0 8px; font-size: 1.05rem; color: var(--plum-700); }
+  .note-box p { margin: 0; color: var(--muted); font-size: .96rem; }
+
+  .lead { font-size: 1.05rem; color: var(--muted); max-width: 760px; }
+
+  /* ===== Cards de opciones ===== */
+  section.options { padding: 24px 0 16px; }
+  .section-title { font-size: 1.8rem; color: var(--plum-700); margin: 32px 0 4px; }
+  .section-sub { color: var(--muted); margin: 0 0 28px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 26px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(42,18,38,.06), 0 18px 40px rgba(42,18,38,.10); }
+
+  .card.recommended { border: 1.5px solid var(--plum-500); }
+
+  .card-head {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .card-num {
+    flex: 0 0 auto;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--plum-100); color: var(--plum-700);
+    display: flex; align-items: center; justify-content: center;
+    font-family: Georgia, serif; font-size: 1.25rem; font-weight: 700;
+  }
+  .card-head .titles { flex: 1; }
+  .card-head h3 { margin: 2px 0 4px; font-size: 1.35rem; color: var(--ink); }
+  .card-head .tagline { color: var(--muted); font-size: .95rem; }
+
+  .badge {
+    display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 999px;
+  }
+  .badge-rec { background: var(--gold); color: #fff; }
+  .badge-sel { background: var(--plum-600); color: #fff; }
+
+  .card.selected {
+    position: relative;
+    border: 2px solid var(--plum-600);
+    box-shadow: 0 4px 10px rgba(110,50,96,.12), 0 18px 44px rgba(110,50,96,.16);
+  }
+  .card.selected .ribbon {
+    position: absolute; top: 0; right: 0;
+    background: var(--plum-600); color: #fff;
+    font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: 6px 16px; border-bottom-left-radius: 12px;
+  }
+
+  .level { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); margin-top: 6px; }
+  .dots { display: inline-flex; gap: 3px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--plum-100); }
+  .dot.on { background: var(--plum-500); }
+
+  .card-body { padding: 22px 28px 26px; }
+
+  .fit {
+    background: var(--plum-50); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;
+    font-size: .92rem;
+  }
+  .fit strong { color: var(--plum-700); }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .col h4 {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
+    margin: 0 0 10px; display: flex; align-items: center; gap: 7px;
+  }
+  .col.pros h4 { color: var(--ok); }
+  .col.cons h4 { color: var(--no); }
+  .col ul { margin: 0; padding: 0; list-style: none; }
+  .col li { font-size: .92rem; padding: 5px 0 5px 24px; position: relative; color: #3a323a; }
+  .col.pros li::before { content: "✓"; position: absolute; left: 0; color: var(--ok); font-weight: 700; }
+  .col.cons li::before { content: "✕"; position: absolute; left: 0; color: var(--no); font-weight: 700; }
+
+  .twist {
+    margin-top: 22px; padding: 16px 20px;
+    background: linear-gradient(135deg, var(--plum-50), #fff);
+    border: 1px dashed var(--plum-300);
+    border-radius: 12px;
+  }
+  .twist .label {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--gold); font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+  }
+  .twist p { margin: 0; font-size: .93rem; color: #423a42; }
+
+  .cta {
+    display: inline-flex; align-items: center; margin-top: 18px;
+    background: var(--plum-600); color: #fff; text-decoration: none;
+    padding: 11px 20px; border-radius: 10px; font-weight: 600; font-size: .92rem;
+    box-shadow: var(--shadow); transition: background .15s ease, transform .15s ease;
+  }
+  .cta:hover { background: var(--plum-700); transform: translateY(-1px); }
+
+  /* ===== Tabla comparativa ===== */
+  section.compare { padding: 40px 0; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); font-size: .9rem; min-width: 720px; }
+  thead th {
+    background: var(--plum-700); color: #fff; text-align: left;
+    padding: 14px 16px; font-weight: 600; font-size: .82rem;
+  }
+  thead th:first-child { border-top-left-radius: var(--radius); }
+  thead th:last-child { border-top-right-radius: var(--radius); }
+  tbody td { padding: 13px 16px; border-top: 1px solid var(--line); }
+  tbody tr:nth-child(even) { background: var(--plum-50); }
+  tbody td:first-child { font-weight: 600; color: var(--plum-700); }
+  .pill { font-size: .72rem; padding: 3px 9px; border-radius: 999px; font-weight: 600; }
+  .pill.lo { background: var(--ok-bg); color: var(--ok); }
+  .pill.mid { background: #fbf1dd; color: var(--gold); }
+  .pill.hi { background: var(--no-bg); color: var(--no); }
+
+  /* ===== Recomendación final ===== */
+  section.verdict { padding: 8px 0 64px; }
+  .verdict-box {
+    background: linear-gradient(135deg, var(--plum-800), var(--plum-600));
+    color: #fff; border-radius: 20px; padding: 40px 44px; box-shadow: var(--shadow);
+  }
+  .verdict-box h2 { margin: 0 0 14px; font-size: 1.7rem; }
+  .verdict-box p { color: #f0e4ed; margin: 0 0 14px; }
+  .verdict-box strong { color: var(--gold-soft); }
+  .verdict-box .next { margin-top: 22px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.18); }
+  .verdict-box .next h4 { font-family: inherit; margin: 0 0 10px; font-size: .82rem; text-transform: uppercase; letter-spacing: .1em; color: var(--gold-soft); }
+  .verdict-box ol { margin: 0; padding-left: 20px; color: #f0e4ed; }
+  .verdict-box ol li { margin-bottom: 6px; }
+
+  footer { text-align: center; padding: 28px 0 40px; color: var(--muted); font-size: .82rem; }
+
+  @media (max-width: 720px) {
+    header h1 { font-size: 2rem; }
+    .cols { grid-template-columns: 1fr; gap: 16px; }
+    .card-head { flex-wrap: wrap; }
+    .verdict-box { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Trabajo Fin de Máster · Full Stack Developer</p>
+    <h1>Opciones de E-commerce para tu TFM</h1>
+    <p>Siete propuestas de tienda online <em>sin pagos reales</em>, pensadas para lucir exactamente lo que has aprendido en el máster. Cada idea incluye su encaje técnico, pros, contras y el enfoque teórico que la eleva al nivel de un TFM.</p>
+    <div class="chips">
+      <span class="chip">Java 17 · Spring Boot</span>
+      <span class="chip">Spring Data JPA</span>
+      <span class="chip">Spring Security · JWT</span>
+      <span class="chip">MySQL</span>
+      <span class="chip">MongoDB</span>
+      <span class="chip">Angular 17 · RxJS</span>
+      <span class="chip">Reactive Forms</span>
+      <span class="chip">JUnit · Mockito · Karma</span>
+      <span class="chip">Docker · CI/CD</span>
+    </div>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="wrap">
+    <p class="lead">Un e-commerce es una elección excelente: cubre de forma natural casi todo el temario (catálogo, autenticación con roles, carrito, formularios, relaciones entre entidades, testing y despliegue). La clave de un buen TFM no es "qué vendes", sino <strong>qué reto técnico extra demuestras</strong>. Por eso cada opción incluye un <em>twist académico</em>.</p>
+
+    <div class="note-box">
+      <h3>¿Qué hace que un e-commerce sea un buen TFM (y no solo una práctica)?</h3>
+      <p>Que demuestre las <strong>tres capas del máster</strong> trabajando juntas (Angular ↔ API REST ↔ BBDD), que aplique <strong>seguridad real con roles</strong> (USER/ADMIN), que tenga <strong>tests en backend y frontend</strong>, que se <strong>despliegue con Docker</strong>, y que incluya <strong>un componente diferenciador</strong> defendible en la memoria. Todas las opciones de abajo cumplen lo común; lo que las distingue es ese componente.</p>
+    </div>
+  </div>
+</section>
+
+<section class="options">
+  <div class="wrap">
+    <h2 class="section-title">Las propuestas</h2>
+    <p class="section-sub">Ordenadas de la más recomendada (y la que ya tenías encaminada) a alternativas igualmente válidas.</p>
+
+    <!-- 1. Librería -->
+    <div class="card recommended">
+      <div class="card-head">
+        <div class="card-num">1</div>
+        <div class="titles">
+          <span class="badge badge-rec">★ Recomendada</span>
+          <h3>Librería online · venta + alquiler</h3>
+          <p class="tagline">Catálogo de libros con compra simulada y un módulo de alquiler con fechas y stock por copia.</p>
+          <span class="level">Dificultad
+            <span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span>
+            Media-alta
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fit">
+          <strong>Encaje con tu stack:</strong> el alquiler introduce una <em>máquina de estados</em> (disponible → alquilado → devuelto) y control de stock por copia, lo que obliga a transacciones JPA, relaciones ricas y reglas de negocio en la capa de servicio. Es el escenario perfecto para Spring Data + Security + Angular Reactive Forms.
+        </div>
+        <div class="cols">
+          <div class="col pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>Ya tienes el modelo de datos y los endpoints esbozados.</li>
+              <li>El alquiler aporta lógica de negocio "de verdad", no solo CRUD.</li>
+              <li>Datos fáciles de poblar (APIs públicas como Open Library / Google Books).</li>
+              <li>Recomendador con justificación teórica clara.</li>
+            </ul>
+          </div>
+          <div class="col cons">
+            <h4>Contras</h4>
+            <ul>
+              <li>Es la idea más "vista" en proyectos académicos.</li>
+              <li>Gestionar fechas, prórrogas y solapamientos tiene casos límite.</li>
+              <li>El chat-buscador en lenguaje natural puede irse de alcance si no lo acotas.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="twist">
+          <div class="label">◆ Twist académico</div>
+          <p><strong>Comparativa de algoritmos de recomendación.</strong> Implementa y compara recomendación por contenido (géneros/autores/tags), por popularidad (ventas recientes) y por afinidad ("porque leíste X"). En la memoria mides relevancia y rendimiento de cada uno. Es un capítulo teórico sólido y muy vendible en una entrevista.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Vinilos -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-num">2</div>
+        <div class="titles">
+          <h3>Tienda de vinilos y música</h3>
+          <p class="tagline">Catálogo de discos con estado de conservación, preventas y previews de audio.</p>
+          <span class="level">Dificultad
+            <span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span>
+            Media
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fit">
+          <strong>Encaje con tu stack:</strong> muy similar a la librería pero más visual y diferenciada. Modelas artista → álbum → pista, estados de stock (nuevo/usado con grading) y preventas con fecha de salida. Buen terreno para filtros avanzados, pipes de Angular y datos de la API de Discogs o Spotify.
+        </div>
+        <div class="cols">
+          <div class="col pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>Tema atractivo y con identidad visual fuerte (cubiertas, géneros).</li>
+              <li>El "grading" de discos usados aporta un modelo de datos interesante.</li>
+              <li>APIs públicas muy ricas (Discogs, MusicBrainz, Spotify).</li>
+              <li>Menos casos límite que el alquiler.</li>
+            </ul>
+          </div>
+          <div class="col cons">
+            <h4>Contras</h4>
+            <ul>
+              <li>Si lo dejas en CRUD puro, se queda corto como TFM.</li>
+              <li>Las previews de audio dependen de APIs externas con límites.</li>
+              <li>Conceptualmente cercano a la librería: necesita su propio diferenciador.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="twist">
+          <div class="label">◆ Twist académico</div>
+          <p><strong>Búsqueda y rendimiento.</strong> Compara el buscador con <code>LIKE %...%</code> en MySQL frente a un índice <em>full-text</em> (o agregaciones en MongoDB), midiendo tiempos de respuesta con un dataset grande. Conecta directamente con los Temas 9, 10 y 20.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Marketplace -->
+    <div class="card selected">
+      <span class="ribbon">✓ Idea seleccionada</span>
+      <div class="card-head">
+        <div class="card-num">3</div>
+        <div class="titles">
+          <span class="badge badge-sel">★ Tu elección</span>
+          <h3>Marketplace de productos artesanales</h3>
+          <p class="tagline">Multivendedor: cada usuario puede ser comprador y/o vendedor con su propia tienda.</p>
+          <span class="level">Dificultad
+            <span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></span>
+            Alta
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fit">
+          <strong>Encaje con tu stack:</strong> es el escenario donde más brilla <strong>Spring Security</strong>. Tienes tres roles reales (COMPRADOR, VENDEDOR, ADMIN), paneles distintos por rol, <code>@PreAuthorize</code> por todas partes y guards de Angular con redirección. El modelo de datos crece (tiendas, comisiones, pedidos por vendedor).
+        </div>
+        <div class="cols">
+          <div class="col pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>Demuestra dominio profundo de seguridad y autorización por rol.</li>
+              <li>Es claramente más ambicioso que una tienda de un solo vendedor.</li>
+              <li>Da pie a dashboards diferenciados (muy lucido en la defensa).</li>
+            </ul>
+          </div>
+          <div class="col cons">
+            <h4>Contras</h4>
+            <ul>
+              <li>Mayor volumen de pantallas y endpoints: cuidado con el tiempo.</li>
+              <li>Riesgo de quedarte sin margen para tests si te dispersas.</li>
+              <li>Necesita acotar bien el MVP para no morir de éxito.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="twist">
+          <div class="label">◆ Twist académico</div>
+          <p><strong>Diseño de un sistema de reputación y confianza.</strong> Modela valoraciones, insignias por ventas completadas y prevención de fraude, y compáralo con eBay/Wallapop. Combínalo con un análisis de la estrategia de autorización (RBAC) frente a alternativas. Profundiza el Tema 8 al máximo.</p>
+        </div>
+        <a class="cta" href="Marketplace-Artesanal.html">Ver desarrollo completo de esta idea&nbsp;→</a>
+      </div>
+    </div>
+
+    <!-- 4. Moda -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-num">4</div>
+        <div class="titles">
+          <h3>Tienda de moda con variantes</h3>
+          <p class="tagline">Ropa y calzado con combinaciones de talla y color, cada una con su propio stock.</p>
+          <span class="level">Dificultad
+            <span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span>
+            Media
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fit">
+          <strong>Encaje con tu stack:</strong> el e-commerce "clásico" por excelencia. Su reto real es el <strong>modelado de variantes</strong> (producto → variante = SKU con talla × color × stock × precio). Es un problema de diseño relacional precioso (Temas 7 y 9) y un caso ideal para Reactive Forms dinámicos al elegir talla/color.
+        </div>
+        <div class="cols">
+          <div class="col pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>El más reconocible: cualquier tribunal entiende el dominio al instante.</li>
+              <li>El modelado de variantes/SKU es un reto técnico genuino y elegante.</li>
+              <li>Filtros por talla/color/precio lucen mucho en Angular.</li>
+              <li>Fácil de hacer responsive y visualmente atractivo (SASS, Tema 24).</li>
+            </ul>
+          </div>
+          <div class="col cons">
+            <h4>Contras</h4>
+            <ul>
+              <li>Es el dominio más genérico: necesita un diferenciador potente.</li>
+              <li>Conseguir imágenes/datos coherentes de catálogo da algo de trabajo.</li>
+              <li>Si no profundizas, se percibe como "una tienda más".</li>
+            </ul>
+          </div>
+        </div>
+        <div class="twist">
+          <div class="label">◆ Twist académico</div>
+          <p><strong>Modelado de variantes + accesibilidad.</strong> Documenta la decisión de diseño del modelo de variantes (¿atributos en tabla, en JSON, en Mongo?) con sus tradeoffs, y añade una auditoría de <em>accesibilidad web (WCAG)</em> del frontend, enlazando con las pruebas avanzadas del Tema 23.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Vivero -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-num">5</div>
+        <div class="titles">
+          <h3>Vivero · tienda de plantas</h3>
+          <p class="tagline">Catálogo de plantas con fichas de cuidados, disponibilidad estacional y guías.</p>
+          <span class="level">Dificultad
+            <span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+            Media-baja
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fit">
+          <strong>Encaje con tu stack:</strong> opción más asequible y muy visual. Además del catálogo, cada planta tiene contenido editorial (luz, riego, dificultad) que da pie a un mini-CMS y a un "asistente" que recomienda plantas según las condiciones del usuario (interior/exterior, mascotas, nivel de experiencia).
+        </div>
+        <div class="cols">
+          <div class="col pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>Alcance controlado: ideal si quieres asegurar calidad sobre cantidad.</li>
+              <li>El "asistente de cuidados" es un diferenciador simpático y abordable.</li>
+              <li>Estética cuidada y agradable de presentar.</li>
+            </ul>
+          </div>
+          <div class="col cons">
+            <h4>Contras</h4>
+            <ul>
+              <li>Es el menos ambicioso: riesgo de parecer "justo de chicha".</li>
+              <li>La disponibilidad estacional puede quedar como un simple flag.</li>
+              <li>Necesitas compensar con buen testing y despliegue para destacar.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="twist">
+          <div class="label">◆ Twist académico</div>
+          <p><strong>Recomendador basado en reglas + SEO/rendimiento.</strong> Un motor de reglas ("poca luz + mascotas → estas 5 plantas") y un estudio de optimización del frontend (lazy loading de imágenes, Core Web Vitals, accesibilidad). Encaja con los guards, resolvers y lazy loading del Tema 19.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Juegos -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-num">6</div>
+        <div class="titles">
+          <h3>Tienda de juegos de mesa y videojuegos</h3>
+          <p class="tagline">Catálogo con fichas ricas, wishlist, reseñas con valoración y recomendaciones.</p>
+          <span class="level">Dificultad
+            <span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></span>
+            Media
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fit">
+          <strong>Encaje con tu stack:</strong> dominio motivador y con datos abundantes (APIs como RAWG o BoardGameGeek). El peso recae en el sistema de <strong>reseñas y valoraciones</strong> (media ponderada, antifraude básico) y en la wishlist, que conecta usuarios con productos y alimenta el recomendador.
+        </div>
+        <div class="cols">
+          <div class="col pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>Tema motivador: se nota cuando el proyecto te interesa.</li>
+              <li>APIs públicas con catálogos enormes para poblar datos reales.</li>
+              <li>Reseñas + valoraciones dan mucho juego de lógica y agregaciones.</li>
+              <li>Filtros por género, nº de jugadores, plataforma… muy lucidos.</li>
+            </ul>
+          </div>
+          <div class="col cons">
+            <h4>Contras</h4>
+            <ul>
+              <li>Comparte ADN con la librería y los vinilos (catálogo + recomendador).</li>
+              <li>El diferenciador hay que buscarlo en las reseñas/comunidad.</li>
+              <li>Las APIs externas tienen límites de uso a vigilar.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="twist">
+          <div class="label">◆ Twist académico</div>
+          <p><strong>Sistema de reseñas y MongoDB para analítica.</strong> Persiste el catálogo en MySQL y los eventos (clics, búsquedas, valoraciones) en MongoDB, usando el <em>Aggregation Pipeline</em> (Tema 10) para construir un panel de "lo más valorado/buscado". Justifica el enfoque políglota de persistencia.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Gourmet suscripción -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-num">7</div>
+        <div class="titles">
+          <h3>Club gourmet por suscripción</h3>
+          <p class="tagline">Tienda de vinos/café con cajas recurrentes mensuales además de la venta puntual.</p>
+          <span class="level">Dificultad
+            <span class="dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span>
+            Media-alta
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fit">
+          <strong>Encaje con tu stack:</strong> el diferenciador es la <strong>suscripción recurrente</strong>: una máquina de estados (activa → pausada → cancelada) y <em>tareas programadas</em> (<code>@Scheduled</code>) que generan el "pedido del mes" automáticamente. Demuestra lógica temporal y procesos de fondo, algo que pocos TFM tocan.
+        </div>
+        <div class="cols">
+          <div class="col pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>La suscripción es un diferenciador técnico real y poco común.</li>
+              <li>Las tareas programadas (cron) enriquecen el backend Spring.</li>
+              <li>Combina venta puntual + recurrente: dos modelos de negocio.</li>
+            </ul>
+          </div>
+          <div class="col cons">
+            <h4>Contras</h4>
+            <ul>
+              <li>La facturación recurrente (aun simulada) tiene casos límite.</li>
+              <li>Probar lógica dependiente del tiempo requiere buen diseño de tests.</li>
+              <li>Más conceptos nuevos = más riesgo de alcance si vas justo de tiempo.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="twist">
+          <div class="label">◆ Twist académico</div>
+          <p><strong>Procesos en segundo plano y testabilidad del tiempo.</strong> Diseña el ciclo de renovación con <code>@Scheduled</code> y documenta cómo testear lógica dependiente del tiempo (relojes inyectables, <em>Clock</em>) con JUnit/Mockito. Es un capítulo de ingeniería que diferencia mucho.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="compare">
+  <div class="wrap">
+    <h2 class="section-title">Tabla comparativa rápida</h2>
+    <p class="section-sub">Una vista de pájaro para decidir según tu tiempo disponible y lo que quieras demostrar.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Opción</th>
+            <th>Dificultad</th>
+            <th>Originalidad</th>
+            <th>Habilidad estrella</th>
+            <th>Twist académico</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 · Librería (venta + alquiler)</td>
+            <td><span class="pill mid">Media-alta</span></td>
+            <td><span class="pill mid">Media</span></td>
+            <td>Lógica de negocio + recomendador</td>
+            <td>Comparar algoritmos de recomendación</td>
+          </tr>
+          <tr>
+            <td>2 · Vinilos y música</td>
+            <td><span class="pill lo">Media</span></td>
+            <td><span class="pill mid">Media</span></td>
+            <td>Filtros y búsqueda</td>
+            <td>Rendimiento de búsqueda (LIKE vs full-text)</td>
+          </tr>
+          <tr>
+            <td>3 · Marketplace artesanal</td>
+            <td><span class="pill hi">Alta</span></td>
+            <td><span class="pill lo">Alta</span></td>
+            <td>Seguridad y roles (RBAC)</td>
+            <td>Sistema de reputación y confianza</td>
+          </tr>
+          <tr>
+            <td>4 · Moda con variantes</td>
+            <td><span class="pill lo">Media</span></td>
+            <td><span class="pill mid">Media</span></td>
+            <td>Modelado de datos (SKU)</td>
+            <td>Variantes + accesibilidad (WCAG)</td>
+          </tr>
+          <tr>
+            <td>5 · Vivero de plantas</td>
+            <td><span class="pill lo">Media-baja</span></td>
+            <td><span class="pill mid">Media</span></td>
+            <td>Frontend y contenido</td>
+            <td>Motor de reglas + SEO/rendimiento</td>
+          </tr>
+          <tr>
+            <td>6 · Juegos de mesa/video</td>
+            <td><span class="pill lo">Media</span></td>
+            <td><span class="pill mid">Media</span></td>
+            <td>Reseñas + analítica</td>
+            <td>Persistencia políglota (MySQL + MongoDB)</td>
+          </tr>
+          <tr>
+            <td>7 · Club gourmet (suscripción)</td>
+            <td><span class="pill mid">Media-alta</span></td>
+            <td><span class="pill lo">Alta</span></td>
+            <td>Procesos en segundo plano</td>
+            <td>Tareas programadas y test del tiempo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="verdict">
+  <div class="wrap">
+    <div class="verdict-box">
+      <h2>Mi recomendación</h2>
+      <p>Si quieres ir sobre seguro y aprovechar el trabajo que ya tienes hecho, quédate con la <strong>Librería (opción 1)</strong>: el alquiler te da lógica de negocio real y el recomendador te da el capítulo teórico. Es equilibrada y la tienes medio planificada.</p>
+      <p>Si quieres <strong>destacar y diferenciarte</strong> del típico TFM de tienda, las apuestas son el <strong><a href="Marketplace-Artesanal.html" style="color:var(--gold-soft);">Marketplace (3) ↗</a></strong> —si te atrae la seguridad y los roles— o el <strong>Club por suscripción (7)</strong> —si te atrae el backend y los procesos automáticos—. Ambas tienen un diferenciador que pocos compañeros tendrán.</p>
+      <p>Y si vas algo justo de tiempo pero quieres acabar con calidad, la <strong>Moda con variantes (4)</strong> o el <strong>Vivero (5)</strong> te dan un alcance más controlado sin renunciar a un buen twist.</p>
+
+      <div class="next">
+        <h4>Próximos pasos sugeridos</h4>
+        <ol>
+          <li>Elige <strong>una</strong> opción y fija el dominio (no más de 1-2 entidades "estrella").</li>
+          <li>Define el <strong>MVP</strong>: catálogo + auth con roles + carrito/checkout simulado + el diferenciador.</li>
+          <li>Confírmalo con tu tutor antes de escribir una línea de código.</li>
+          <li>Cuando lo tengas claro, pídeme el <strong>roadmap completo, el modelo de datos y el esqueleto del proyecto</strong>.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Documento de apoyo a la decisión del TFM · Máster Full Stack Developer · Generado a partir del temario (Temas 1-24)
+  </div>
+</footer>
+
+</body>
+</html>

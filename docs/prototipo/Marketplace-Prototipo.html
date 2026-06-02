@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace Artesanal · Prototipo interactivo</title>
+<style>
+  :root {
+    --plum-950:#2a1226; --plum-800:#45203d; --plum-700:#5b2a4e; --plum-600:#6e3260;
+    --plum-500:#8a4178; --plum-300:#c79ebb; --plum-100:#f4e9f1; --plum-50:#faf5f8;
+    --gold:#b9883b; --gold-soft:#e8d4a8;
+    --ink:#241c22; --muted:#6f6470; --line:#ebe0e8; --bg:#fbf8fa; --card:#fff;
+    --ok:#2f7a55; --ok-bg:#e6f3ec; --no:#a8424b; --no-bg:#f7e7e8; --heart:#d6455a;
+    --shadow:0 1px 2px rgba(42,18,38,.04), 0 8px 24px rgba(42,18,38,.06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4 { font-family:Georgia,"Times New Roman",serif; line-height:1.2; margin:0; }
+  button { font-family:inherit; cursor:pointer; }
+  code { background:var(--plum-100); color:var(--plum-700); padding:1px 6px; border-radius:5px; font-size:.85em; }
+
+  /* ===== Barra de prototipo (superior) ===== */
+  .proto-bar { position:sticky; top:0; z-index:100; background:var(--plum-950); color:#f0e4ed; }
+  .proto-inner { max-width:1180px; margin:0 auto; padding:9px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .proto-inner .lbl { font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; color:var(--gold-soft); font-weight:700; white-space:nowrap; }
+  .proto-tabs { display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; flex:1; }
+  .proto-tabs::-webkit-scrollbar { display:none; }
+  .proto-tabs button { background:transparent; border:1px solid transparent; color:#cdb9c6; font-size:.83rem; font-weight:500; padding:6px 13px; border-radius:999px; white-space:nowrap; transition:all .15s ease; }
+  .proto-tabs button:hover { color:#fff; background:rgba(255,255,255,.08); }
+  .proto-tabs button.active { background:var(--gold); color:#2a1226; font-weight:700; }
+  .proto-back { font-size:.78rem; color:var(--gold-soft); text-decoration:none; white-space:nowrap; font-weight:600; }
+  .proto-back:hover { text-decoration:underline; }
+
+  /* ===== App bar ===== */
+  .appbar { position:sticky; top:39px; z-index:90; background:#fff; border-bottom:1px solid var(--line); box-shadow:0 2px 12px rgba(42,18,38,.04); }
+  .appbar-in { max-width:1180px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:16px; }
+  .logo { font-family:Georgia,serif; font-weight:700; color:var(--plum-700); font-size:1.1rem; display:flex; align-items:center; gap:9px; cursor:pointer; white-space:nowrap; }
+  .logo .sq { width:20px; height:20px; border-radius:6px; background:linear-gradient(135deg,var(--plum-600),var(--gold)); }
+  .searchbar { flex:1; background:var(--plum-50); border:1px solid var(--line); border-radius:999px; padding:9px 16px; color:var(--muted); font-size:.88rem; display:flex; align-items:center; gap:8px; }
+  .searchbar input { border:none; background:transparent; outline:none; flex:1; font-size:.88rem; color:var(--ink); }
+  .iconbtn { position:relative; background:none; border:none; font-size:1.2rem; color:var(--muted); padding:6px; border-radius:8px; transition:color .15s, background .15s; }
+  .iconbtn:hover { color:var(--plum-600); background:var(--plum-50); }
+  .iconbtn .count { position:absolute; top:-2px; right:-2px; background:var(--plum-600); color:#fff; font-size:.62rem; font-weight:700; min-width:16px; height:16px; border-radius:999px; display:flex; align-items:center; justify-content:center; padding:0 4px; font-family:-apple-system,sans-serif; transform:scale(0); transition:transform .2s cubic-bezier(.34,1.56,.64,1); }
+  .iconbtn .count.show { transform:scale(1); }
+  .iconbtn .count.heart { background:var(--heart); }
+  .vendbtn { background:#fff; color:var(--plum-600); border:1px solid var(--plum-300); border-radius:999px; padding:8px 16px; font-weight:600; font-size:.85rem; transition:all .15s; white-space:nowrap; }
+  .vendbtn:hover { background:var(--plum-600); color:#fff; border-color:var(--plum-600); }
+
+  /* ===== Layout pantallas ===== */
+  .stage { max-width:1180px; margin:0 auto; padding:24px 20px 60px; }
+  .screen { display:none; animation:fade .25s ease; }
+  .screen.active { display:block; }
+  @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  .screen-title { font-size:1.5rem; color:var(--plum-700); margin-bottom:4px; }
+  .screen-sub { color:var(--muted); font-size:.92rem; margin-bottom:22px; }
+
+  /* ===== Pills categorías ===== */
+  .cats { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  .cats button { background:#fff; border:1px solid var(--line); color:var(--muted); font-size:.85rem; padding:7px 15px; border-radius:999px; transition:all .15s; }
+  .cats button:hover { border-color:var(--plum-300); color:var(--plum-700); }
+  .cats button.active { background:var(--plum-600); color:#fff; border-color:var(--plum-600); font-weight:600; }
+
+  /* ===== Shop layout ===== */
+  .shop { display:grid; grid-template-columns:210px 1fr; gap:22px; }
+  .filters { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; height:fit-content; box-shadow:var(--shadow); }
+  .filters h5 { font-family:-apple-system,sans-serif; font-size:.72rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin:0 0 8px; }
+  .filters .opt { display:flex; align-items:center; gap:9px; padding:6px 0; font-size:.88rem; color:#574e57; cursor:pointer; user-select:none; }
+  .ck { width:16px; height:16px; border:1.5px solid var(--plum-300); border-radius:4px; display:flex; align-items:center; justify-content:center; transition:all .15s; flex:0 0 auto; }
+  .ck.on { background:var(--plum-500); border-color:var(--plum-500); }
+  .ck.on::after { content:"✓"; color:#fff; font-size:.7rem; font-weight:700; }
+  .filters hr { border:none; border-top:1px solid var(--line); margin:14px 0; }
+
+  /* ===== Product grid ===== */
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .pcard { background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); transition:transform .18s, box-shadow .18s; position:relative; }
+  .pcard:hover { transform:translateY(-3px); box-shadow:0 4px 8px rgba(42,18,38,.06),0 18px 40px rgba(42,18,38,.10); }
+  .pcard .ph { height:130px; background:linear-gradient(135deg,var(--plum-100),#efe2ea); display:flex; align-items:center; justify-content:center; color:var(--plum-300); font-size:.8rem; cursor:pointer; }
+  .heart { position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.92); border:none; font-size:1rem; color:var(--muted); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.12); transition:all .18s; }
+  .heart:hover { color:var(--heart); transform:scale(1.1); }
+  .heart.on { color:var(--heart); background:#fff; }
+  .heart.on.pop { animation:pop .35s ease; }
+  @keyframes pop { 0%{transform:scale(1);} 40%{transform:scale(1.35);} 100%{transform:scale(1);} }
+  .pcard .pb { padding:12px 14px; }
+  .pcard .pt { font-weight:600; font-size:.92rem; margin-bottom:2px; }
+  .pcard .pseller { font-size:.78rem; color:var(--muted); margin-bottom:9px; }
+  .pcard .verified { color:var(--ok); font-weight:700; }
+  .pcard .prow { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .pcard .price { font-weight:700; color:var(--plum-700); font-size:1.05rem; }
+  .pcard .rate { font-size:.8rem; color:var(--gold); }
+  .addbtn { width:100%; background:var(--plum-600); color:#fff; border:none; border-radius:9px; padding:9px; font-size:.85rem; font-weight:600; transition:all .2s; }
+  .addbtn:hover { background:var(--plum-700); }
+  .addbtn.added { background:var(--ok); }
+
+  /* ===== Ficha producto ===== */
+  .detail { display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+  .gallery .big { height:300px; border-radius:16px; display:flex; align-items:center; justify-content:center; color:var(--plum-300); font-size:.95rem; box-shadow:var(--shadow); transition:background .3s; }
+  .gallery .thumbs { display:flex; gap:10px; margin-top:12px; }
+  .gallery .thumbs button { width:64px; height:64px; border-radius:10px; border:2px solid var(--line); background:var(--plum-50); cursor:pointer; transition:border-color .15s; }
+  .gallery .thumbs button.on { border-color:var(--plum-500); }
+  .dinfo h2 { font-size:1.7rem; margin-bottom:6px; }
+  .dinfo .meta { color:var(--muted); font-size:.9rem; }
+  .dinfo .price { font-size:2rem; font-weight:700; color:var(--plum-700); font-family:Georgia,serif; margin:14px 0 6px; }
+  .stock { color:var(--ok); font-size:.85rem; font-weight:600; }
+  .seller-card { border:1px solid var(--line); border-radius:14px; padding:16px; margin:18px 0; background:var(--plum-50); }
+  .seller-card .srow { display:flex; align-items:center; gap:12px; }
+  .avatar { width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,var(--plum-500),var(--gold)); flex:0 0 auto; }
+  .sname { font-weight:700; font-size:1rem; }
+  .srep { font-size:.82rem; color:var(--gold); }
+  .badges { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
+  .bdg { font-size:.72rem; background:#fff; border:1px solid var(--line); padding:4px 11px; border-radius:999px; color:var(--plum-600); font-weight:600; }
+  .bdg.verified { background:var(--ok-bg); color:var(--ok); border-color:#bfe2cd; }
+  .qty { display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-right:10px; }
+  .qty button { width:38px; height:42px; border:none; background:#fff; font-size:1.1rem; color:var(--plum-600); }
+  .qty button:hover { background:var(--plum-50); }
+  .qty span { min-width:38px; text-align:center; font-weight:700; }
+  .dactions { display:flex; align-items:center; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .bigbtn { background:var(--plum-600); color:#fff; border:none; border-radius:11px; padding:13px 26px; font-weight:700; font-size:.95rem; transition:all .2s; }
+  .bigbtn:hover { background:var(--plum-700); }
+  .bigbtn.added { background:var(--ok); }
+  .savebtn { background:#fff; color:var(--plum-600); border:1.5px solid var(--plum-300); border-radius:11px; padding:13px 22px; font-weight:600; transition:all .18s; }
+  .savebtn:hover { border-color:var(--plum-500); }
+  .savebtn.on { background:#fdeef0; color:var(--heart); border-color:var(--heart); }
+
+  /* ===== Reseñas ===== */
+  .reviews { margin-top:34px; border-top:1px solid var(--line); padding-top:24px; }
+  .reviews h3 { color:var(--plum-700); margin-bottom:16px; }
+  .review { border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px; background:#fff; }
+  .review .rh { display:flex; justify-content:space-between; margin-bottom:5px; }
+  .review .who { font-weight:600; font-size:.9rem; }
+  .review .vchip { color:var(--ok); font-size:.72rem; font-weight:700; }
+  .review p { margin:0; font-size:.9rem; color:#574e57; }
+  .writebox { background:var(--plum-50); border:1px dashed var(--plum-300); border-radius:12px; padding:16px; margin-top:8px; }
+  .writebox h4 { color:var(--plum-700); margin-bottom:10px; font-size:1rem; }
+  .starpick { font-size:1.6rem; color:var(--plum-300); cursor:pointer; display:inline-flex; gap:3px; }
+  .starpick span { transition:color .12s, transform .12s; }
+  .starpick span:hover { transform:scale(1.15); }
+  .starpick span.on { color:var(--gold); }
+  .writebox textarea { width:100%; border:1px solid var(--line); border-radius:9px; padding:10px; font-family:inherit; font-size:.88rem; margin:10px 0; resize:vertical; min-height:60px; outline:none; }
+  .writebox textarea:focus { border-color:var(--plum-300); }
+
+  /* ===== Carrito ===== */
+  .cart-wrap { display:grid; grid-template-columns:1fr 320px; gap:24px; }
+  .cart-items { display:flex; flex-direction:column; gap:12px; }
+  .citem { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px; display:flex; gap:14px; align-items:center; box-shadow:var(--shadow); }
+  .citem .cimg { width:64px; height:64px; border-radius:9px; background:linear-gradient(135deg,var(--plum-100),#efe2ea); flex:0 0 auto; }
+  .citem .cinfo { flex:1; }
+  .citem .cinfo .t { font-weight:600; font-size:.92rem; }
+  .citem .cinfo .s { font-size:.78rem; color:var(--muted); }
+  .citem .cprice { font-weight:700; color:var(--plum-700); }
+  .citem .rm { background:none; border:none; color:var(--no); font-size:.8rem; padding:4px; }
+  .citem .rm:hover { text-decoration:underline; }
+  .empty { text-align:center; padding:50px 20px; color:var(--muted); background:#fff; border:1px dashed var(--line); border-radius:14px; }
+  .summary { background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; height:fit-content; box-shadow:var(--shadow); position:sticky; top:130px; }
+  .summary h3 { color:var(--plum-700); margin-bottom:14px; }
+  .sline { display:flex; justify-content:space-between; font-size:.9rem; color:#574e57; padding:6px 0; }
+  .sline.total { border-top:1px solid var(--line); margin-top:8px; padding-top:12px; font-size:1.15rem; font-weight:700; color:var(--ink); }
+  .checkout { width:100%; background:var(--plum-600); color:#fff; border:none; border-radius:11px; padding:14px; font-weight:700; font-size:.95rem; margin-top:14px; transition:all .2s; }
+  .checkout:hover { background:var(--plum-700); }
+  .checkout:disabled { background:var(--line); color:var(--muted); cursor:not-allowed; }
+  .simnote { font-size:.74rem; color:var(--muted); text-align:center; margin-top:10px; }
+
+  /* ===== Panel vendedor ===== */
+  .dash { display:grid; grid-template-columns:190px 1fr; gap:0; border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); }
+  .dside { background:var(--plum-800); color:#f0e4ed; padding:18px 0; }
+  .dside .di { padding:11px 20px; font-size:.88rem; color:#d9c5d3; display:flex; gap:10px; align-items:center; cursor:pointer; border-left:3px solid transparent; transition:all .15s; }
+  .dside .di:hover { background:rgba(255,255,255,.06); color:#fff; }
+  .dside .di.on { background:rgba(255,255,255,.12); color:#fff; border-left-color:var(--gold); font-weight:600; }
+  .dmain { padding:22px; background:var(--bg); }
+  .dpanel { display:none; }
+  .dpanel.active { display:block; animation:fade .2s ease; }
+  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+  .kpi { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .kpi .k { font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .kpi .v { font-size:1.5rem; font-weight:700; color:var(--plum-700); font-family:Georgia,serif; }
+  .kpi .d { font-size:.74rem; color:var(--ok); }
+  .dtable { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:.86rem; }
+  .dtable th { background:#faf5f8; text-align:left; padding:11px 16px; color:var(--muted); font-weight:600; font-size:.78rem; }
+  .dtable td { padding:11px 16px; border-top:1px solid var(--line); color:#574e57; }
+  .st { font-size:.7rem; padding:3px 9px; border-radius:999px; font-weight:700; }
+  .st.ok { background:var(--ok-bg); color:var(--ok); }
+  .st.pend { background:#fbf1dd; color:var(--gold); }
+  .miniact { background:var(--plum-600); color:#fff; border:none; border-radius:7px; padding:5px 11px; font-size:.76rem; font-weight:600; }
+  .miniact:hover { background:var(--plum-700); }
+  .miniact.done { background:var(--ok-bg); color:var(--ok); cursor:default; }
+
+  /* ===== Acceso (login/registro) ===== */
+  .auth { max-width:420px; margin:10px auto; background:#fff; border:1px solid var(--line); border-radius:18px; padding:30px; box-shadow:var(--shadow); }
+  .auth-tabs { display:flex; background:var(--plum-50); border-radius:11px; padding:4px; margin-bottom:22px; }
+  .auth-tabs button { flex:1; background:none; border:none; padding:10px; border-radius:8px; font-weight:600; color:var(--muted); transition:all .15s; }
+  .auth-tabs button.on { background:#fff; color:var(--plum-700); box-shadow:var(--shadow); }
+  .field { margin-bottom:14px; }
+  .field label { display:block; font-size:.78rem; font-weight:600; color:var(--muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:.04em; }
+  .field input { width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 13px; font-family:inherit; font-size:.92rem; outline:none; transition:border-color .15s; }
+  .field input:focus { border-color:var(--plum-400, var(--plum-300)); }
+  .rolepick { display:none; gap:8px; }
+  .rolepick.show { display:flex; }
+  .rolepick button { flex:1; border:1.5px solid var(--line); background:#fff; border-radius:10px; padding:11px; font-size:.85rem; font-weight:600; color:var(--muted); transition:all .15s; }
+  .rolepick button.on { border-color:var(--plum-500); background:var(--plum-50); color:var(--plum-700); }
+  .authbtn { width:100%; background:var(--plum-600); color:#fff; border:none; border-radius:11px; padding:13px; font-weight:700; font-size:.95rem; margin-top:8px; transition:all .2s; }
+  .authbtn:hover { background:var(--plum-700); }
+
+  /* ===== Admin ===== */
+  .adminlist { display:flex; flex-direction:column; gap:12px; max-width:760px; }
+  .arow { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; display:flex; align-items:center; gap:14px; box-shadow:var(--shadow); }
+  .arow .avatar { width:40px; height:40px; }
+  .arow .ainfo { flex:1; }
+  .arow .ainfo .t { font-weight:700; font-size:.95rem; }
+  .arow .ainfo .s { font-size:.8rem; color:var(--muted); }
+  .verifybtn { background:#fff; color:var(--ok); border:1.5px solid #bfe2cd; border-radius:9px; padding:9px 16px; font-weight:600; font-size:.85rem; transition:all .18s; }
+  .verifybtn:hover { background:var(--ok-bg); }
+  .verifybtn.done { background:var(--ok); color:#fff; border-color:var(--ok); cursor:default; }
+
+  /* ===== Toast ===== */
+  .toast-wrap { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; }
+  .toast { background:var(--plum-950); color:#fff; padding:12px 22px; border-radius:999px; font-size:.88rem; font-weight:500; box-shadow:0 8px 30px rgba(42,18,38,.3); display:flex; align-items:center; gap:9px; animation:toastIn .3s cubic-bezier(.34,1.56,.64,1); }
+  .toast .ok-ico { color:#8fdcae; font-weight:700; }
+  @keyframes toastIn { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:none;} }
+  .toast.out { animation:toastOut .3s ease forwards; }
+  @keyframes toastOut { to{opacity:0; transform:translateY(20px);} }
+
+  .hint { background:var(--plum-50); border:1px solid var(--line); border-left:4px solid var(--gold); border-radius:10px; padding:12px 16px; font-size:.85rem; color:var(--muted); margin-bottom:20px; }
+  .hint b { color:var(--plum-700); }
+
+  @media (max-width:860px){
+    .shop{ grid-template-columns:1fr; } .filters{ order:2; }
+    .grid{ grid-template-columns:repeat(2,1fr); }
+    .detail{ grid-template-columns:1fr; } .cart-wrap{ grid-template-columns:1fr; }
+    .dash{ grid-template-columns:64px 1fr; } .dside .di span:last-child{ display:none; }
+    .kpis{ grid-template-columns:repeat(2,1fr); }
+    .appbar{ top:0; } .proto-bar{ position:static; }
+  }
+  @media (max-width:520px){ .grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ===== Barra prototipo ===== -->
+<div class="proto-bar">
+  <div class="proto-inner">
+    <span class="lbl">◆ Prototipo</span>
+    <div class="proto-tabs" id="protoTabs">
+      <button data-screen="explorar" class="active">Explorar</button>
+      <button data-screen="producto">Ficha de producto</button>
+      <button data-screen="carrito">Carrito</button>
+      <button data-screen="vendedor">Panel vendedor</button>
+      <button data-screen="acceso">Acceso</button>
+      <button data-screen="admin">Admin</button>
+    </div>
+    <a class="proto-back" href="Marketplace-Artesanal.html">← Volver al diseño</a>
+  </div>
+</div>
+
+<!-- ===== App bar ===== -->
+<div class="appbar">
+  <div class="appbar-in">
+    <div class="logo" onclick="go('explorar')"><span class="sq"></span> Artesanía</div>
+    <div class="searchbar">🔍 <input placeholder="Buscar productos, tiendas, categorías…"></div>
+    <button class="iconbtn" onclick="go('acceso')" title="Mi cuenta">👤</button>
+    <button class="iconbtn" onclick="go('explorar')" title="Favoritos">♡<span class="count heart" id="wishCount">0</span></button>
+    <button class="iconbtn" onclick="go('carrito')" title="Carrito">🛒<span class="count" id="cartCount">0</span></button>
+    <button class="vendbtn" onclick="go('vendedor')">Vender</button>
+  </div>
+</div>
+
+<div class="stage">
+
+  <!-- ============ EXPLORAR ============ -->
+  <section class="screen active" id="screen-explorar">
+    <h1 class="screen-title">Explorar el marketplace</h1>
+    <p class="screen-sub">Filtra por categoría, guarda con el corazón ♡ y añade al carrito. El contador de arriba se actualiza en vivo.</p>
+    <div class="hint">💡 <b>Pruébalo:</b> pulsa una categoría para filtrar, toca el corazón de un producto para guardarlo, y pulsa "Añadir" para verlo sumar en el carrito.</div>
+
+    <div class="cats" id="cats">
+      <button data-cat="todo" class="active">Todo</button>
+      <button data-cat="ceramica">Cerámica</button>
+      <button data-cat="joyeria">Joyería</button>
+      <button data-cat="cuero">Cuero</button>
+      <button data-cat="ilustracion">Ilustración</button>
+      <button data-cat="textil">Textil</button>
+    </div>
+
+    <div class="shop">
+      <aside class="filters">
+        <h5>Precio</h5>
+        <div class="opt" onclick="toggleCk(this)"><span class="ck"></span> Menos de 20 €</div>
+        <div class="opt" onclick="toggleCk(this)"><span class="ck on"></span> 20 – 50 €</div>
+        <div class="opt" onclick="toggleCk(this)"><span class="ck"></span> Más de 50 €</div>
+        <hr>
+        <h5>Valoración</h5>
+        <div class="opt" onclick="toggleCk(this)"><span class="ck"></span> 4★ y más</div>
+        <hr>
+        <h5>Confianza</h5>
+        <div class="opt" onclick="toggleCk(this)"><span class="ck on"></span> Solo verificados</div>
+      </aside>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ FICHA PRODUCTO ============ -->
+  <section class="screen" id="screen-producto">
+    <h1 class="screen-title">Ficha de producto</h1>
+    <p class="screen-sub">Cambia la imagen con las miniaturas, ajusta la cantidad, guarda y añade al carrito. Abajo puedes "valorar" con estrellas.</p>
+
+    <div class="detail">
+      <div class="gallery">
+        <div class="big" id="bigImg" style="background:linear-gradient(135deg,var(--plum-100),#efe2ea);">imagen principal</div>
+        <div class="thumbs" id="thumbs">
+          <button class="on" data-bg="linear-gradient(135deg,#f4e9f1,#efe2ea)"></button>
+          <button data-bg="linear-gradient(135deg,#e9eef4,#dfe7ef)"></button>
+          <button data-bg="linear-gradient(135deg,#f4efe9,#efe8df)"></button>
+        </div>
+      </div>
+      <div class="dinfo">
+        <h2>Taza esmaltada azul cobalto</h2>
+        <div class="meta">Cerámica · hecha a mano · 300 ml</div>
+        <div class="price">24,00 €</div>
+        <div class="stock">● En stock (7 unidades)</div>
+
+        <div class="seller-card">
+          <div class="srow">
+            <div class="avatar"></div>
+            <div>
+              <div class="sname">Cerámica Lola</div>
+              <div class="srep">★ 4.9 · Reputación 92/100</div>
+            </div>
+          </div>
+          <div class="badges">
+            <span class="bdg verified">✓ Verificado</span>
+            <span class="bdg">Artesano destacado</span>
+            <span class="bdg">+100 ventas</span>
+          </div>
+        </div>
+
+        <div class="dactions">
+          <div class="qty">
+            <button onclick="stepQty(-1)">−</button>
+            <span id="qtyVal">1</span>
+            <button onclick="stepQty(1)">+</button>
+          </div>
+          <button class="bigbtn" id="detailAdd" onclick="addDetail()">Añadir al carrito</button>
+          <button class="savebtn" id="detailSave" onclick="toggleDetailSave()">♡ Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews">
+      <h3>Reseñas verificadas (38)</h3>
+      <div class="review">
+        <div class="rh"><span class="who">María G. <span class="vchip">✓ compra verificada</span></span><span style="color:var(--gold)">★★★★★</span></div>
+        <p>Preciosa y muy bien embalada. Repetiré sin duda.</p>
+      </div>
+      <div class="review">
+        <div class="rh"><span class="who">Javier R. <span class="vchip">✓ compra verificada</span></span><span style="color:var(--gold)">★★★★☆</span></div>
+        <p>El color es algo más oscuro que en la foto, pero la calidad es excelente.</p>
+      </div>
+
+      <div class="writebox">
+        <h4>Deja tu valoración</h4>
+        <div class="starpick" id="starpick">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+        <textarea placeholder="Cuenta tu experiencia con este producto…"></textarea>
+        <button class="bigbtn" onclick="sendReview()">Publicar reseña</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CARRITO ============ -->
+  <section class="screen" id="screen-carrito">
+    <h1 class="screen-title">Tu carrito</h1>
+    <p class="screen-sub">Cambia cantidades, elimina productos y observa cómo se recalcula el total. El checkout es simulado.</p>
+    <div class="cart-wrap">
+      <div class="cart-items" id="cartItems"></div>
+      <div class="summary">
+        <h3>Resumen</h3>
+        <div class="sline"><span>Subtotal</span><span id="sumSubtotal">0,00 €</span></div>
+        <div class="sline"><span>Envío estimado</span><span id="sumShip">—</span></div>
+        <div class="sline total"><span>Total</span><span id="sumTotal">0,00 €</span></div>
+        <button class="checkout" id="checkoutBtn" onclick="checkout()">Finalizar compra</button>
+        <p class="simnote">Pago simulado · no se cobra nada real</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PANEL VENDEDOR ============ -->
+  <section class="screen" id="screen-vendedor">
+    <h1 class="screen-title">Panel del vendedor</h1>
+    <p class="screen-sub">Vista exclusiva del rol <code>SELLER</code>. Cambia de pestaña en la barra lateral y marca pedidos como enviados.</p>
+    <div class="dash">
+      <div class="dside" id="dside">
+        <div class="di on" data-panel="resumen">▦ <span>Resumen</span></div>
+        <div class="di" data-panel="productos">📦 <span>Mis productos</span></div>
+        <div class="di" data-panel="pedidos">🧾 <span>Pedidos</span></div>
+        <div class="di" data-panel="resenas">★ <span>Reseñas</span></div>
+      </div>
+      <div class="dmain">
+        <!-- resumen -->
+        <div class="dpanel active" id="panel-resumen">
+          <h3 style="font-family:Georgia,serif;color:var(--plum-700);margin-bottom:14px;">Hola, Cerámica Lola 👋</h3>
+          <div class="kpis">
+            <div class="kpi"><div class="k">Ventas (mes)</div><div class="v">1.240 €</div><div class="d">▲ 12%</div></div>
+            <div class="kpi"><div class="k">Pedidos</div><div class="v">28</div><div class="d">▲ 4 nuevos</div></div>
+            <div class="kpi"><div class="k">Valoración</div><div class="v">4.9</div><div class="d">38 reseñas</div></div>
+            <div class="kpi"><div class="k">Reputación</div><div class="v">92</div><div class="d">Top 10%</div></div>
+          </div>
+          <table class="dtable">
+            <thead><tr><th>Pedido</th><th>Producto</th><th>Comprador</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>#1042</td><td>Taza esmaltada azul</td><td>María G.</td><td><span class="st pend">Pendiente</span></td></tr>
+              <tr><td>#1041</td><td>Cuenco de gres</td><td>Javier R.</td><td><span class="st ok">Entregado</span></td></tr>
+              <tr><td>#1039</td><td>Taza esmaltada azul</td><td>Lucía P.</td><td><span class="st ok">Entregado</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- productos -->
+        <div class="dpanel" id="panel-productos">
+          <h3 style="font-family:Georgia,serif;color:var(--plum-700);margin-bottom:14px;">Mis productos</h3>
+          <table class="dtable">
+            <thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>Taza esmaltada azul</td><td>24 €</td><td>7</td><td><span class="st ok">Publicado</span></td></tr>
+              <tr><td>Cuenco de gres</td><td>30 €</td><td>3</td><td><span class="st ok">Publicado</span></td></tr>
+              <tr><td>Jarrón minimal</td><td>48 €</td><td>0</td><td><span class="st pend">Sin stock</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- pedidos -->
+        <div class="dpanel" id="panel-pedidos">
+          <h3 style="font-family:Georgia,serif;color:var(--plum-700);margin-bottom:14px;">Pedidos recibidos</h3>
+          <table class="dtable">
+            <thead><tr><th>Pedido</th><th>Producto</th><th>Comprador</th><th>Acción</th></tr></thead>
+            <tbody id="ordersBody">
+              <tr><td>#1042</td><td>Taza esmaltada azul</td><td>María G.</td><td><button class="miniact" onclick="ship(this)">Marcar enviado</button></td></tr>
+              <tr><td>#1043</td><td>Cuenco de gres</td><td>Pedro L.</td><td><button class="miniact" onclick="ship(this)">Marcar enviado</button></td></tr>
+              <tr><td>#1044</td><td>Taza esmaltada azul</td><td>Ana T.</td><td><button class="miniact" onclick="ship(this)">Marcar enviado</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- reseñas -->
+        <div class="dpanel" id="panel-resenas">
+          <h3 style="font-family:Georgia,serif;color:var(--plum-700);margin-bottom:14px;">Reseñas de tus clientes</h3>
+          <div class="review"><div class="rh"><span class="who">María G.</span><span style="color:var(--gold)">★★★★★</span></div><p>Preciosa y muy bien embalada. Repetiré sin duda.</p></div>
+          <div class="review"><div class="rh"><span class="who">Javier R.</span><span style="color:var(--gold)">★★★★☆</span></div><p>El color es algo más oscuro que en la foto, pero la calidad es excelente.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ACCESO ============ -->
+  <section class="screen" id="screen-acceso">
+    <h1 class="screen-title">Acceso a la plataforma</h1>
+    <p class="screen-sub">Alterna entre iniciar sesión y registrarte. Al registrarte puedes elegir si quieres además vender.</p>
+    <div class="auth">
+      <div class="auth-tabs">
+        <button id="tabLogin" class="on" onclick="authTab('login')">Iniciar sesión</button>
+        <button id="tabReg" onclick="authTab('registro')">Registrarse</button>
+      </div>
+      <div class="field"><label>Email</label><input type="email" placeholder="tu@email.com"></div>
+      <div class="field" id="nameField" style="display:none;"><label>Nombre</label><input placeholder="Tu nombre"></div>
+      <div class="field"><label>Contraseña</label><input type="password" placeholder="••••••••"></div>
+      <div class="field" id="roleField" style="display:none;">
+        <label>¿Cómo quieres empezar?</label>
+        <div class="rolepick show">
+          <button class="on" data-role="buyer" onclick="pickRole(this)">🛍️ Comprar</button>
+          <button data-role="seller" onclick="pickRole(this)">🏪 Comprar y vender</button>
+        </div>
+      </div>
+      <button class="authbtn" id="authSubmit" onclick="authSubmit()">Entrar</button>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section class="screen" id="screen-admin">
+    <h1 class="screen-title">Backoffice · Administración</h1>
+    <p class="screen-sub">Vista del rol <code>ADMIN</code>. Verifica las tiendas pendientes (el botón cambia de estado al aprobar).</p>
+    <div class="hint">💡 Verificar una tienda le otorga la insignia <b>✓ Verificado</b> que ves en el marketplace y aumenta su confianza.</div>
+    <div class="adminlist">
+      <div class="arow"><div class="avatar"></div><div class="ainfo"><div class="t">TierraFina</div><div class="s">Joyería · solicitó verificación hace 2 días</div></div><button class="verifybtn" onclick="verify(this)">Verificar tienda</button></div>
+      <div class="arow"><div class="avatar"></div><div class="ainfo"><div class="t">Textil Sur</div><div class="s">Textil · solicitó verificación hace 5 días</div></div><button class="verifybtn" onclick="verify(this)">Verificar tienda</button></div>
+      <div class="arow"><div class="avatar"></div><div class="ainfo"><div class="t">Estudio Nim</div><div class="s">Ilustración · solicitó verificación hace 1 semana</div></div><button class="verifybtn" onclick="verify(this)">Verificar tienda</button></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+  /* ===== Datos ===== */
+  const PRODUCTS = [
+    { id:1, t:"Taza esmaltada azul", s:"Cerámica Lola", v:true, price:24, rate:4.9, cat:"ceramica" },
+    { id:2, t:"Collar de plata hoja", s:"JoyaViva", v:false, price:38, rate:4.7, cat:"joyeria" },
+    { id:3, t:"Cartera de cuero", s:"Tallereta", v:true, price:45, rate:5.0, cat:"cuero" },
+    { id:4, t:"Lámina acuarela", s:"Estudio Nim", v:false, price:22, rate:4.6, cat:"ilustracion" },
+    { id:5, t:"Cuenco de gres", s:"Cerámica Lola", v:true, price:30, rate:4.8, cat:"ceramica" },
+    { id:6, t:"Pendientes de arcilla", s:"TierraFina", v:false, price:19, rate:4.5, cat:"joyeria" },
+    { id:7, t:"Bolso tejido a mano", s:"Textil Sur", v:false, price:52, rate:4.4, cat:"textil" },
+    { id:8, t:"Marcapáginas de cuero", s:"Tallereta", v:true, price:9, rate:4.9, cat:"cuero" },
+    { id:9, t:"Print botánico", s:"Estudio Nim", v:false, price:16, rate:4.7, cat:"ilustracion" }
+  ];
+
+  /* ===== Estado ===== */
+  const cart = {};        // id -> qty
+  const wishlist = new Set();
+  let curCat = "todo";
+
+  const euro = n => n.toFixed(2).replace('.', ',') + ' €';
+
+  /* ===== Navegación entre pantallas ===== */
+  function go(screen){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + screen).classList.add('active');
+    document.querySelectorAll('#protoTabs button').forEach(b =>
+      b.classList.toggle('active', b.dataset.screen === screen));
+    window.scrollTo({ top:0, behavior:'smooth' });
+    if(screen === 'carrito') renderCart();
+  }
+  document.querySelectorAll('#protoTabs button').forEach(b =>
+    b.addEventListener('click', () => go(b.dataset.screen)));
+
+  /* ===== Grid de productos ===== */
+  function renderGrid(){
+    const grid = document.getElementById('grid');
+    const list = PRODUCTS.filter(p => curCat === 'todo' || p.cat === curCat);
+    grid.innerHTML = list.map(p => `
+      <div class="pcard">
+        <button class="heart ${wishlist.has(p.id)?'on':''}" onclick="toggleWish(${p.id}, this)">${wishlist.has(p.id)?'♥':'♡'}</button>
+        <div class="ph" onclick="go('producto')">imagen</div>
+        <div class="pb">
+          <div class="pt">${p.t}</div>
+          <div class="pseller">${p.s} ${p.v?'<span class="verified">✓</span>':''}</div>
+          <div class="prow"><span class="price">${euro(p.price)}</span><span class="rate">★ ${p.rate.toFixed(1)}</span></div>
+          <button class="addbtn" onclick="addToCart(${p.id}, this)">Añadir al carrito</button>
+        </div>
+      </div>`).join('');
+  }
+
+  /* ===== Categorías ===== */
+  document.getElementById('cats').addEventListener('click', e => {
+    const btn = e.target.closest('button'); if(!btn) return;
+    curCat = btn.dataset.cat;
+    document.querySelectorAll('#cats button').forEach(b => b.classList.toggle('active', b === btn));
+    renderGrid();
+  });
+
+  /* ===== Filtros (solo visual) ===== */
+  function toggleCk(el){ el.querySelector('.ck').classList.toggle('on'); }
+
+  /* ===== Wishlist ===== */
+  function toggleWish(id, btn){
+    if(wishlist.has(id)){ wishlist.delete(id); btn.classList.remove('on'); btn.textContent='♡'; }
+    else { wishlist.add(id); btn.classList.add('on','pop'); btn.textContent='♥'; setTimeout(()=>btn.classList.remove('pop'),350); toast('Guardado en favoritos'); }
+    updateBadges();
+  }
+
+  /* ===== Carrito ===== */
+  function addToCart(id, btn){
+    cart[id] = (cart[id]||0) + 1;
+    updateBadges();
+    if(btn){ const o=btn.textContent; btn.classList.add('added'); btn.textContent='✓ Añadido'; setTimeout(()=>{btn.classList.remove('added'); btn.textContent=o;},900); }
+    toast('Añadido al carrito');
+  }
+  function updateBadges(){
+    const c = Object.values(cart).reduce((a,b)=>a+b,0);
+    const w = wishlist.size;
+    const cc = document.getElementById('cartCount'), wc = document.getElementById('wishCount');
+    cc.textContent = c; cc.classList.toggle('show', c>0);
+    wc.textContent = w; wc.classList.toggle('show', w>0);
+  }
+  function renderCart(){
+    const box = document.getElementById('cartItems');
+    const ids = Object.keys(cart).filter(id => cart[id] > 0);
+    if(!ids.length){
+      box.innerHTML = '<div class="empty">🛒 Tu carrito está vacío.<br><br><button class="bigbtn" onclick="go(\'explorar\')">Explorar productos</button></div>';
+      document.getElementById('sumSubtotal').textContent = euro(0);
+      document.getElementById('sumTotal').textContent = euro(0);
+      document.getElementById('sumShip').textContent = '—';
+      document.getElementById('checkoutBtn').disabled = true;
+      return;
+    }
+    let subtotal = 0;
+    box.innerHTML = ids.map(id => {
+      const p = PRODUCTS.find(x => x.id == id); const qty = cart[id]; subtotal += p.price * qty;
+      return `<div class="citem">
+        <div class="cimg"></div>
+        <div class="cinfo"><div class="t">${p.t}</div><div class="s">${p.s}</div>
+          <div class="qty" style="margin-top:8px;">
+            <button onclick="changeQty(${id},-1)">−</button><span>${qty}</span><button onclick="changeQty(${id},1)">+</button>
+          </div>
+        </div>
+        <div style="text-align:right;"><div class="cprice">${euro(p.price*qty)}</div>
+          <button class="rm" onclick="removeItem(${id})">Eliminar</button></div>
+      </div>`;
+    }).join('');
+    const ship = subtotal >= 60 ? 0 : 3.95;
+    document.getElementById('sumSubtotal').textContent = euro(subtotal);
+    document.getElementById('sumShip').textContent = ship === 0 ? 'Gratis' : euro(ship);
+    document.getElementById('sumTotal').textContent = euro(subtotal + ship);
+    document.getElementById('checkoutBtn').disabled = false;
+  }
+  function changeQty(id, d){ cart[id] = Math.max(0, (cart[id]||0)+d); if(cart[id]===0) delete cart[id]; updateBadges(); renderCart(); }
+  function removeItem(id){ delete cart[id]; updateBadges(); renderCart(); toast('Producto eliminado'); }
+  function checkout(){
+    for(const k in cart) delete cart[k];
+    updateBadges(); renderCart();
+    toast('¡Pedido realizado! (simulado)');
+  }
+
+  /* ===== Ficha producto ===== */
+  let qtyVal = 1;
+  function stepQty(d){ qtyVal = Math.max(1, qtyVal + d); document.getElementById('qtyVal').textContent = qtyVal; }
+  function addDetail(){
+    cart[1] = (cart[1]||0) + qtyVal; updateBadges();
+    const b = document.getElementById('detailAdd'); b.classList.add('added'); b.textContent='✓ Añadido al carrito';
+    setTimeout(()=>{ b.classList.remove('added'); b.textContent='Añadir al carrito'; }, 1100);
+    toast('Añadido al carrito (' + qtyVal + ')');
+  }
+  function toggleDetailSave(){
+    const b = document.getElementById('detailSave');
+    if(wishlist.has(1)){ wishlist.delete(1); b.classList.remove('on'); b.textContent='♡ Guardar'; }
+    else { wishlist.add(1); b.classList.add('on'); b.textContent='♥ Guardado'; toast('Guardado en favoritos'); }
+    updateBadges();
+  }
+  // miniaturas
+  document.getElementById('thumbs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#thumbs button').forEach(x => x.classList.toggle('on', x===b));
+    document.getElementById('bigImg').style.background = b.dataset.bg;
+  });
+  // estrellas
+  let starVal = 0;
+  const sp = document.getElementById('starpick');
+  sp.querySelectorAll('span').forEach(st => {
+    st.addEventListener('click', () => {
+      starVal = +st.dataset.v;
+      sp.querySelectorAll('span').forEach(x => x.classList.toggle('on', +x.dataset.v <= starVal));
+    });
+  });
+  function sendReview(){ toast(starVal ? '¡Gracias por tu reseña de ' + starVal + '★!' : 'Selecciona una puntuación primero'); }
+
+  /* ===== Panel vendedor ===== */
+  document.getElementById('dside').addEventListener('click', e => {
+    const di = e.target.closest('.di'); if(!di) return;
+    document.querySelectorAll('#dside .di').forEach(x => x.classList.toggle('on', x===di));
+    document.querySelectorAll('.dpanel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + di.dataset.panel).classList.add('active');
+  });
+  function ship(btn){ btn.outerHTML = '<span class="st ok">✓ Enviado</span>'; toast('Pedido marcado como enviado'); }
+
+  /* ===== Acceso ===== */
+  function authTab(which){
+    const login = which === 'login';
+    document.getElementById('tabLogin').classList.toggle('on', login);
+    document.getElementById('tabReg').classList.toggle('on', !login);
+    document.getElementById('nameField').style.display = login ? 'none' : 'block';
+    document.getElementById('roleField').style.display = login ? 'none' : 'block';
+    document.getElementById('authSubmit').textContent = login ? 'Entrar' : 'Crear cuenta';
+  }
+  function pickRole(btn){ document.querySelectorAll('.rolepick button').forEach(b => b.classList.toggle('on', b===btn)); }
+  function authSubmit(){ toast(document.getElementById('tabLogin').classList.contains('on') ? 'Sesión iniciada (simulado)' : 'Cuenta creada (simulado)'); }
+
+  /* ===== Admin ===== */
+  function verify(btn){ btn.classList.add('done'); btn.textContent='✓ Verificada'; btn.disabled = true; toast('Tienda verificada'); }
+
+  /* ===== Toast ===== */
+  function toast(msg){
+    const wrap = document.getElementById('toasts');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = '<span class="ok-ico">✓</span>' + msg;
+    wrap.appendChild(t);
+    setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(), 300); }, 2000);
+  }
+
+  /* ===== Init ===== */
+  renderGrid();
+  updateBadges();
+</script>
+</body>
+</html>
