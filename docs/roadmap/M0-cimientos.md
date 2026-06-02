@@ -244,7 +244,7 @@ PETICIÓN PROTEGIDA
 > Esta tabla es el subconjunto de M0 de la [matriz de endpoints](../05-seguridad-rbac.md). Los
 > endpoints de catálogo, carrito, etc. se añaden en hitos posteriores.
 
-### 4.6 Validación (Bean Validation)
+### 4.6 Validación (Bean Validation)****
 
 - `RegisterRequest`: `@Email`, `@NotBlank` en `nombre`, `@Size(min=8)` en `password`.
 - Email duplicado → `409 Conflict` con mensaje claro (manejado en el handler global).

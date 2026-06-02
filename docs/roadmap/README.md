@@ -8,7 +8,7 @@ alcance, las piezas técnicas a construir, los criterios de aceptación y los ch
 | Hito | Semana | Documento | Estado |
 |------|--------|-----------|--------|
 | **M0** | 1 | [Cimientos — Setup y autenticación](M0-cimientos.md) | 🚧 En curso |
-| **M1** | 2-3 | Catálogo y tiendas *(pendiente)* | ⏳ |
+| **M1** | 2-3 | [Catálogo y tiendas — Productos, categorías y rol vendedor](M1-catalogo-y-tiendas.md) | 📋 Planificado |
 | **M2** | 4 | Compra y reseñas *(pendiente)* | ⏳ |
 | **M3** | 5-6 | Twist + calidad *(pendiente)* | ⏳ |
 
