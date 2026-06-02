@@ -74,28 +74,6 @@ navegador):
 | `Marketplace-Artesanal.html` | Desarrollo completo de la propuesta elegida. |
 | `Marketplace-Prototipo.html` | Prototipo interactivo (solo frontend). |
 
-## 🗺️ Estado y roadmap
-
-El proyecto se desarrolla en cuatro hitos (M0 → M3). Ver el detalle en
-[docs/08-roadmap.md](docs/08-roadmap.md).
-
-| Hito | Contenido | Estado |
-|------|-----------|:------:|
-| M0 | Setup + autenticación (JWT) | ⬜ Pendiente |
-| M1 | Catálogo, tiendas y rol vendedor | ⬜ Pendiente |
-| M2 | Carrito, checkout y reseñas | ⬜ Pendiente |
-| M3 | Reputación, tests y memoria | ⬜ Pendiente |
-
-## 🚀 Puesta en marcha
-
-> El esqueleto de código se creará en el hito **M0**. Una vez disponible, la ejecución prevista
-> será mediante Docker Compose:
-
-```bash
-# (previsto a partir de M0)
-docker compose up --build
-```
-
 ## 📄 Licencia
 
 Proyecto académico desarrollado como Trabajo Fin de Máster. Uso educativo.
