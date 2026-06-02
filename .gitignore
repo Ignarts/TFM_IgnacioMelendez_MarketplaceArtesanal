@@ -1,0 +1,85 @@
+# ===== Sistema operativo =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ===== Editores / IDEs =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.factorypath
+
+# ===== Backend · Java / Spring Boot / Maven =====
+backend/target/
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.log
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+# Gradle (por si se usa en lugar de Maven)
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ===== Frontend · Node / Angular =====
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+dist/
+.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Cobertura de tests
+coverage/
+frontend/coverage/
+
+# ===== Variables de entorno y secretos =====
+.env
+.env.local
+.env.*.local
+*.local.properties
+application-local.properties
+application-local.yml
+src/main/resources/application-secret*.properties
+
+# ===== Docker =====
+# (no se ignora docker-compose.yml; sí volúmenes locales)
+.docker/
+docker-data/
+
+# ===== Bases de datos locales =====
+*.db
+*.sqlite
+*.sqlite3
+data/
+mysql-data/
+mongo-data/
+
+# ===== Misceláneo =====
+*.tmp
+*.bak
+*.pid
