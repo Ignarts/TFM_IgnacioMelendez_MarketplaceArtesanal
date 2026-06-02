@@ -21,6 +21,7 @@ prototipo interactivo navegable.
 | 06 | [Sistema de reputación](06-sistema-reputacion.md) | El *twist* académico: marco teórico, score, insignias y antifraude. |
 | 07 | [Diseño de la interfaz](07-diseno-ui.md) | Pantallas clave, identidad visual y notas de componentes. |
 | 08 | [Roadmap](08-roadmap.md) | Planificación por hitos M0 → M3. |
+| — | [Roadmap · detalle por hitos](roadmap/) | Desarrollo detallado de cada hito (M0 en curso). |
 
 ## Prototipos de partida
 
