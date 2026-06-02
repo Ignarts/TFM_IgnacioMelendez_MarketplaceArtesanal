@@ -9,7 +9,7 @@ alcance, las piezas técnicas a construir, los criterios de aceptación y los ch
 |------|--------|-----------|--------|
 | **M0** | 1 | [Cimientos — Setup y autenticación](M0-cimientos.md) | 🚧 En curso |
 | **M1** | 2-3 | [Catálogo y tiendas — Productos, categorías y rol vendedor](M1-catalogo-y-tiendas.md) | 📋 Planificado |
-| **M2** | 4 | Compra y reseñas *(pendiente)* | ⏳ |
+| **M2** | 4 | [Compra y reseñas — Carrito, checkout simulado y valoraciones](M2-compra-y-resenas.md) | 📋 Planificado |
 | **M3** | 5-6 | Twist + calidad *(pendiente)* | ⏳ |
 
 > Cada documento de hito se redacta justo antes de abordarlo, partiendo del roadmap general y
