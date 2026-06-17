@@ -46,10 +46,41 @@ la **seguridad por roles (RBAC)** y un **sistema de reputación y confianza** en
 │   ├── 07-diseno-ui.md
 │   ├── 08-roadmap.md
 │   └── prototipo/        # HTML de partida (propuesta + prototipo interactivo)
-├── backend/             # API REST Spring Boot   (pendiente — hito M0)
-├── frontend/            # SPA Angular            (pendiente — hito M0)
-├── docker-compose.yml   # api + mysql (+ mongo)  (pendiente — hito M0)
+├── backend/             # API REST Spring Boot  (Java 17 · auth JWT)
+├── frontend/            # SPA Angular           (auth: login/registro/perfil)
+├── docker-compose.yml   # api + mysql
+├── .env.example         # plantilla de variables (copiar a .env)
 └── README.md
+```
+
+## 🚀 Puesta en marcha (hito M0)
+
+Requisitos: **Docker + Docker Compose** y, para el frontend, **Node 20+**.
+
+```bash
+# 1. Variables de entorno (secreto JWT, credenciales DB)
+cp .env.example .env        # y edita JWT_SECRET
+
+# 2. Backend + MySQL
+docker compose up --build   # API en http://localhost:8080
+
+# 3. Frontend (en otra terminal)
+cd frontend && npm install && npm start   # SPA en http://localhost:4200
+```
+
+- **Swagger UI**: http://localhost:8080/swagger-ui.html (endpoints `auth` y `me`).
+- **Tests backend**: `cd backend && ./mvnw test`.
+
+Smoke test de la API:
+
+```bash
+curl -X POST localhost:8080/api/auth/register -H "Content-Type: application/json" \
+  -d '{"email":"ana@test.com","password":"password123","nombre":"Ana"}'
+
+TOKEN=$(curl -s -X POST localhost:8080/api/auth/login -H "Content-Type: application/json" \
+  -d '{"email":"ana@test.com","password":"password123"}' | sed 's/.*"token":"\([^"]*\)".*/\1/')
+
+curl localhost:8080/api/me -H "Authorization: Bearer $TOKEN"
 ```
 
 ## 📚 Documentación
