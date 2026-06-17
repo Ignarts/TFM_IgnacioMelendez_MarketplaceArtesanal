@@ -8,7 +8,8 @@ COPY src ./src
 RUN mvn package -DskipTests -q
 
 # ── Stage 2: runtime ─────────────────────────────────────────────────────────
-FROM eclipse-temurin:17-jre-alpine
+# 17-jre es multi-arch (la variante -alpine no publica arm64)
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
