@@ -3,12 +3,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
-  selector: 'app-perfil',
+  selector: 'app-profile',
   template: `
     <h1>Mi perfil</h1>
     @if (auth.user(); as u) {
       <ul>
-        <li><strong>Nombre:</strong> {{ u.nombre }}</li>
+        <li><strong>Nombre:</strong> {{ u.name }}</li>
         <li><strong>Email:</strong> {{ u.email }}</li>
         <li><strong>Roles:</strong> {{ u.roles.join(', ') }}</li>
       </ul>
@@ -18,7 +18,7 @@ import { AuthService } from '../../core/auth/auth.service';
     <button (click)="logout()">Cerrar sesión</button>
   `,
 })
-export class Perfil implements OnInit {
+export class Profile implements OnInit {
   auth = inject(AuthService);
   private router = inject(Router);
 
