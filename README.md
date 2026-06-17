@@ -46,10 +46,58 @@ la **seguridad por roles (RBAC)** y un **sistema de reputación y confianza** en
 │   ├── 07-diseno-ui.md
 │   ├── 08-roadmap.md
 │   └── prototipo/        # HTML de partida (propuesta + prototipo interactivo)
-├── backend/             # API REST Spring Boot   (pendiente — hito M0)
-├── frontend/            # SPA Angular            (pendiente — hito M0)
-├── docker-compose.yml   # api + mysql (+ mongo)  (pendiente — hito M0)
+├── backend/             # API REST Spring Boot  (Java 17 · auth JWT)
+├── frontend/            # SPA Angular           (auth: login/registro/perfil)
+├── docker-compose.yml   # api + mysql
+├── .env.example         # plantilla de variables (copiar a .env)
 └── README.md
+```
+
+## 🚀 Puesta en marcha (hito M0)
+
+Requisitos: **Docker + Docker Compose** (backend + base de datos) y **Node 20+** (frontend).
+
+```bash
+# 1. Variables de entorno — copia la plantilla y genera un secreto JWT
+cp .env.example .env
+# Edita .env y pon un JWT_SECRET largo, por ejemplo:
+#   openssl rand -base64 64
+
+# 2. Backend + MySQL (desde la raíz del repo)
+docker compose up --build
+
+# 3. Frontend (en otra terminal, desde la raíz del repo)
+cd frontend && npm install && npm start
+```
+
+### 🌐 URLs
+
+Con todo levantado:
+
+| Servicio | URL | Descripción |
+|----------|-----|-------------|
+| **Frontend (SPA)** | http://localhost:4200 | Aplicación Angular (login / registro / perfil). |
+| **Backend (API REST)** | http://localhost:8080/api | Endpoints de la API (`/auth/register`, `/auth/login`, `/me`). |
+| **Swagger UI** | http://localhost:8080/swagger-ui.html | Documentación interactiva de la API. |
+| **OpenAPI (JSON)** | http://localhost:8080/v3/api-docs | Especificación OpenAPI. |
+| **MySQL** | `localhost:3306` | Base de datos (credenciales en `.env`). |
+
+> La API tarda unos segundos en estar lista tras `docker compose up` (espera a la línea
+> `Started MarketplaceApplication` en el log). El frontend espera la API en `localhost:8080`.
+
+### ✅ Verificación
+
+- **Tests backend**: `cd backend && ./mvnw test`
+- **Smoke test de la API** (registro → login → endpoint protegido):
+
+```bash
+curl -X POST localhost:8080/api/auth/register -H "Content-Type: application/json" \
+  -d '{"email":"ana@test.com","password":"password123","nombre":"Ana"}'
+
+TOKEN=$(curl -s -X POST localhost:8080/api/auth/login -H "Content-Type: application/json" \
+  -d '{"email":"ana@test.com","password":"password123"}' | sed 's/.*"token":"\([^"]*\)".*/\1/')
+
+curl localhost:8080/api/me -H "Authorization: Bearer $TOKEN"
 ```
 
 ## 📚 Documentación
