@@ -55,23 +55,40 @@ la **seguridad por roles (RBAC)** y un **sistema de reputación y confianza** en
 
 ## 🚀 Puesta en marcha (hito M0)
 
-Requisitos: **Docker + Docker Compose** y, para el frontend, **Node 20+**.
+Requisitos: **Docker + Docker Compose** (backend + base de datos) y **Node 20+** (frontend).
 
 ```bash
-# 1. Variables de entorno (secreto JWT, credenciales DB)
-cp .env.example .env        # y edita JWT_SECRET
+# 1. Variables de entorno — copia la plantilla y genera un secreto JWT
+cp .env.example .env
+# Edita .env y pon un JWT_SECRET largo, por ejemplo:
+#   openssl rand -base64 64
 
-# 2. Backend + MySQL
-docker compose up --build   # API en http://localhost:8080
+# 2. Backend + MySQL (desde la raíz del repo)
+docker compose up --build
 
-# 3. Frontend (en otra terminal)
-cd frontend && npm install && npm start   # SPA en http://localhost:4200
+# 3. Frontend (en otra terminal, desde la raíz del repo)
+cd frontend && npm install && npm start
 ```
 
-- **Swagger UI**: http://localhost:8080/swagger-ui.html (endpoints `auth` y `me`).
-- **Tests backend**: `cd backend && ./mvnw test`.
+### 🌐 URLs
 
-Smoke test de la API:
+Con todo levantado:
+
+| Servicio | URL | Descripción |
+|----------|-----|-------------|
+| **Frontend (SPA)** | http://localhost:4200 | Aplicación Angular (login / registro / perfil). |
+| **Backend (API REST)** | http://localhost:8080/api | Endpoints de la API (`/auth/register`, `/auth/login`, `/me`). |
+| **Swagger UI** | http://localhost:8080/swagger-ui.html | Documentación interactiva de la API. |
+| **OpenAPI (JSON)** | http://localhost:8080/v3/api-docs | Especificación OpenAPI. |
+| **MySQL** | `localhost:3306` | Base de datos (credenciales en `.env`). |
+
+> La API tarda unos segundos en estar lista tras `docker compose up` (espera a la línea
+> `Started MarketplaceApplication` en el log). El frontend espera la API en `localhost:8080`.
+
+### ✅ Verificación
+
+- **Tests backend**: `cd backend && ./mvnw test`
+- **Smoke test de la API** (registro → login → endpoint protegido):
 
 ```bash
 curl -X POST localhost:8080/api/auth/register -H "Content-Type: application/json" \
