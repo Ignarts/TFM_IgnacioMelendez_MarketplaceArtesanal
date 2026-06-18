@@ -1,0 +1,40 @@
+:host { display: block; }
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.85rem 1.5rem;
+  background: linear-gradient(90deg, var(--eggplant-900), var(--eggplant-600));
+  box-shadow: var(--shadow);
+}
+
+nav a {
+  color: #f3e7ef;
+  font-weight: 500;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+nav a:hover { color: #fff; border-bottom-color: var(--gold); }
+
+/* First link acts as the brand */
+nav a:first-child {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  color: var(--gold);
+  border-bottom: none;
+}
+
+nav button {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #f3e7ef;
+}
+nav button:hover { background: rgba(255, 255, 255, 0.12); }
+
+main {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
