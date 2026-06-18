@@ -4,7 +4,7 @@ import java.util.Set;
 
 public record AuthResponse(
         String token,
-        String tipo,
+        String type,
         String email,
         Set<String> roles
 ) {

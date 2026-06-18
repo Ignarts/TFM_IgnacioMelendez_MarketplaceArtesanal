@@ -25,7 +25,7 @@ class AuthFlowTests {
     void loginReturnsTokenForValidCredentials() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(APPLICATION_JSON)
-                        .content("{\"email\":\"ana@test.com\",\"password\":\"password123\",\"nombre\":\"Ana\"}"))
+                        .content("{\"email\":\"ana@test.com\",\"password\":\"password123\",\"name\":\"Ana\"}"))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/auth/login")

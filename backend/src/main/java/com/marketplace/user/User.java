@@ -27,7 +27,7 @@ public class User {
 
     @NotBlank
     @Column(nullable = false)
-    private String nombre;
+    private String name;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -40,10 +40,10 @@ public class User {
 
     public User() {}
 
-    public User(String email, String passwordHash, String nombre, Set<Role> roles) {
+    public User(String email, String passwordHash, String name, Set<Role> roles) {
         this.email = email;
         this.passwordHash = passwordHash;
-        this.nombre = nombre;
+        this.name = name;
         this.roles = roles;
     }
 
@@ -55,8 +55,8 @@ public class User {
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
     public Set<Role> getRoles() { return roles; }
     public void setRoles(Set<Role> roles) { this.roles = roles; }

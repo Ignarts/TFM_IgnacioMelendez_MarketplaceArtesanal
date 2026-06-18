@@ -52,7 +52,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                // Sin token → 401 (no 403, que es el default de Spring para anónimos)
+                // No token → 401 (not 403, which is Spring's default for anonymous requests)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authenticationProvider(authenticationProvider())

@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ProblemDetail handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        problem.setTitle("Email ya registrado");
+        problem.setTitle("Email already registered");
         problem.setDetail(ex.getMessage());
         return problem;
     }
@@ -27,15 +27,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail handleBadCredentials() {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        problem.setTitle("Credenciales inválidas");
-        problem.setDetail("Email o contraseña incorrectos");
+        problem.setTitle("Invalid credentials");
+        problem.setDetail("Incorrect email or password");
         return problem;
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ProblemDetail handleAuthentication(AuthenticationException ex) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        problem.setTitle("No autenticado");
+        problem.setTitle("Not authenticated");
         problem.setDetail(ex.getMessage());
         return problem;
     }
@@ -46,8 +46,8 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage,
                         (a, b) -> a));
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problem.setTitle("Error de validación");
-        problem.setProperties(Map.of("errores", errors));
+        problem.setTitle("Validation error");
+        problem.setProperties(Map.of("errors", errors));
         return problem;
     }
 }
