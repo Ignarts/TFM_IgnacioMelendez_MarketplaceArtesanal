@@ -7,11 +7,14 @@ import com.marketplace.product.dto.ProductRequest;
 import com.marketplace.shop.Shop;
 import com.marketplace.shop.ShopService;
 import com.marketplace.user.User;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +30,32 @@ public class ProductService {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.shopService = shopService;
+    }
+
+    // ponytail: returns full list, no pagination — add Pageable when the catalog grows
+    public List<Product> search(String q, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice) {
+        Specification<Product> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (q != null && !q.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("title")), "%" + q.toLowerCase() + "%"));
+            }
+            if (categoryId != null) {
+                predicates.add(cb.equal(root.get("category").get("id"), categoryId));
+            }
+            if (minPrice != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+            }
+            if (maxPrice != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        return productRepository.findAll(spec);
+    }
+
+    public Product getById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
     }
 
     @PreAuthorize("hasRole('SELLER')")
