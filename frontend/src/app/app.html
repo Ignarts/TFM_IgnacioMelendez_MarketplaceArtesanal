@@ -1,9 +1,12 @@
 <nav>
   <a routerLink="/">Explorar</a>
+  <a routerLink="/carrito">Carrito@if (cart.count() > 0) { <span class="cart-count">{{ cart.count() }}</span> }</a>
   @if (auth.isLoggedIn()) {
+    <a routerLink="/pedidos">Mis pedidos</a>
     <a routerLink="/profile">Perfil</a>
     @if (isSeller()) {
       <a routerLink="/mi-tienda">Mi tienda</a>
+      <a routerLink="/mis-ventas">Mis ventas</a>
     } @else {
       <a routerLink="/vender">Vender</a>
     }

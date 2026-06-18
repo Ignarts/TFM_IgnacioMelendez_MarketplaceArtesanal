@@ -129,6 +129,42 @@ curl -X POST localhost:8080/api/seller/products -H "Authorization: Bearer $TOKEN
 curl localhost:8080/api/products
 ```
 
+## 🛒 Compra y reseñas (hito M2)
+
+Carrito (en el navegador), checkout simulado con pedido por tienda, ciclo de estados y reseñas
+verificadas.
+
+| Endpoint | Método | Acceso | Descripción |
+|----------|--------|--------|-------------|
+| `/api/orders` | `POST` | autenticado | Checkout del carrito (crea **un pedido por tienda**, descuenta stock). |
+| `/api/orders` | `GET` | autenticado | Histórico de mis pedidos. |
+| `/api/orders/{id}/pay` | `POST` | comprador | Pago simulado: `PENDING → PAID`. |
+| `/api/orders/{id}/confirm` | `POST` | comprador | Confirmar recepción: `SHIPPED → DELIVERED`. |
+| `/api/seller/orders` | `GET` | `SELLER` | Pedidos recibidos por mi tienda. |
+| `/api/seller/orders/{id}/ship` | `POST` | `SELLER` | Marcar enviado `PAID → SHIPPED` (**regla de propiedad**). |
+| `/api/products/{id}/reviews` | `GET` | público | Reseñas de un producto. |
+| `/api/products/{id}/reviews` | `POST` | comprador | Reseña verificada (solo con pedido `DELIVERED`, una por producto). |
+
+Ciclo de estados del pedido: `PENDING → PAID → SHIPPED → DELIVERED`. El precio se **congela** en
+cada línea (`OrderItem`) en el momento de la compra.
+
+En el frontend: carrito en `/carrito`, histórico del comprador en `/pedidos`, panel de ventas del
+vendedor en `/mis-ventas` (guard de rol `SELLER`) y bloque de reseñas en la ficha de producto.
+
+```bash
+# Comprar y reseñar (reusa el $TOKEN de un comprador y el id de producto $PID)
+ORDER=$(curl -s -X POST localhost:8080/api/orders -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"items\":[{\"productId\":$PID,\"quantity\":1}]}" | sed 's/.*"id":\([0-9]*\).*/\1/')
+
+curl -X POST localhost:8080/api/orders/$ORDER/pay -H "Authorization: Bearer $TOKEN"
+# (el vendedor marca enviado con su token: POST /api/seller/orders/$ORDER/ship)
+curl -X POST localhost:8080/api/orders/$ORDER/confirm -H "Authorization: Bearer $TOKEN"
+
+curl -X POST localhost:8080/api/products/$PID/reviews -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" -d '{"rating":5,"comment":"Preciosa"}'
+```
+
 ## 📚 Documentación
 
 La documentación completa está en [`docs/`](docs/README.md). Puntos de entrada recomendados:

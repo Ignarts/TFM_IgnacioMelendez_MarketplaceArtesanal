@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth/auth.service';
+import { OrderService } from './core/order/order.service';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,7 @@ import { AuthService } from './core/auth/auth.service';
 })
 export class App {
   auth = inject(AuthService);
+  cart = inject(OrderService);
   private router = inject(Router);
 
   isSeller = computed(() => this.auth.user()?.roles.includes('SELLER') ?? false);
