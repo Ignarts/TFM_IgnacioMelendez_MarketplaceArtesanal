@@ -1,8 +1,17 @@
 <nav>
   <a routerLink="/">Explorar</a>
-  <a routerLink="/perfil">Perfil</a>
-  <a routerLink="/login">Login</a>
-  <a routerLink="/registro">Registro</a>
+  @if (auth.isLoggedIn()) {
+    <a routerLink="/perfil">Perfil</a>
+    @if (isSeller()) {
+      <a routerLink="/mi-tienda">Mi tienda</a>
+    } @else {
+      <a routerLink="/vender">Vender</a>
+    }
+    <button type="button" (click)="logout()">Cerrar sesión</button>
+  } @else {
+    <a routerLink="/login">Login</a>
+    <a routerLink="/registro">Registro</a>
+  }
 </nav>
 <main>
   <router-outlet />
