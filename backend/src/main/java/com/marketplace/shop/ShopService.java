@@ -21,8 +21,8 @@ public class ShopService {
     }
 
     /**
-     * Opens a shop for the user and grants the SELLER role.
-     * The new role only reaches the client on the next login (the current JWT is unchanged).
+     * Opens a shop for the user and grants the SELLER role. Authorities are loaded from the
+     * database on every request, so the new role takes effect on the next call (no re-login).
      */
     @Transactional
     public Shop openShop(User owner, CreateShopRequest request) {

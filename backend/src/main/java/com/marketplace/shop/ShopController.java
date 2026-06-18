@@ -29,7 +29,7 @@ public class ShopController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Abrir tienda (otorga el rol SELLER; requiere volver a iniciar sesión)")
+    @Operation(summary = "Abrir tienda (otorga el rol SELLER)")
     public ShopResponse openShop(@AuthenticationPrincipal UserDetails principal,
                                  @Valid @RequestBody CreateShopRequest request) {
         User owner = userService.getByEmail(principal.getUsername());
