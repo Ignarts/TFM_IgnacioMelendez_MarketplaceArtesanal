@@ -100,6 +100,35 @@ TOKEN=$(curl -s -X POST localhost:8080/api/auth/login -H "Content-Type: applicat
 curl localhost:8080/api/me -H "Authorization: Bearer $TOKEN"
 ```
 
+## 🛍️ Catálogo y tiendas (hito M1)
+
+Sobre la base de M0 se añaden tiendas, productos y categorías con seguridad por roles.
+
+| Endpoint | Método | Acceso | Descripción |
+|----------|--------|--------|-------------|
+| `/api/categories` | `GET` | público | Listado de categorías (semilla fija). |
+| `/api/products` | `GET` | público | Explorador con filtros `q`, `categoryId`, `minPrice`, `maxPrice`. |
+| `/api/products/{id}` | `GET` | público | Ficha de producto. |
+| `/api/seller/shop` | `POST` · `GET` | autenticado | Abrir / consultar tienda (otorga `ROLE_SELLER`). |
+| `/api/seller/products` | `GET` · `POST` | `SELLER` | Listar / crear productos de mi tienda. |
+| `/api/seller/products/{id}` | `PUT` · `DELETE` | `SELLER` | Editar / borrar **con regla de propiedad**. |
+
+En el frontend: explorador público en `/`, ficha en `/producto/:id`, alta de vendedor en
+`/vender` y panel de tienda en `/mi-tienda` (protegido por guard de rol `SELLER`).
+
+```bash
+# Abrir tienda y publicar un producto (reusa el $TOKEN del smoke test de M0)
+curl -X POST localhost:8080/api/seller/shop -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" -d '{"name":"Cerámica Ana"}'
+
+CAT=$(curl -s localhost:8080/api/categories | sed 's/.*"id":\([0-9]*\).*/\1/')
+curl -X POST localhost:8080/api/seller/products -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"title\":\"Vasija\",\"price\":19.90,\"stock\":5,\"categoryId\":$CAT}"
+
+curl localhost:8080/api/products
+```
+
 ## 📚 Documentación
 
 La documentación completa está en [`docs/`](docs/README.md). Puntos de entrada recomendados:

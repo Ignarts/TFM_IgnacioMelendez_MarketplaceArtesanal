@@ -9,11 +9,11 @@ Una posible planificación en cuatro hitos. La idea es tener algo funcional pron
 Proyecto Spring Boot + Angular, Docker Compose (api + MySQL), entidad `User`, registro/login
 con JWT y guards básicos en Angular.
 
-- [ ] Esqueleto backend (Spring Boot) y frontend (Angular).
-- [ ] Docker Compose con `api` + `mysql`.
-- [ ] Entidad `User` y persistencia.
-- [ ] Registro y login con JWT.
-- [ ] Guards básicos e interceptor JWT en Angular.
+- [x] Esqueleto backend (Spring Boot) y frontend (Angular).
+- [x] Docker Compose con `api` + `mysql`.
+- [x] Entidad `User` y persistencia.
+- [x] Registro y login con JWT.
+- [x] Guards básicos e interceptor JWT en Angular.
 
 **Objetivo:** poder registrarse e iniciar sesión.
 
@@ -23,11 +23,11 @@ con JWT y guards básicos en Angular.
 CRUD de productos, alta como vendedor (tienda), explorador con filtros, fichas de producto.
 Aquí se materializa la seguridad por roles y la regla de propiedad.
 
-- [ ] Entidades `Shop`, `Product`, `Category`.
-- [ ] Alta de vendedor (apertura de tienda).
-- [ ] CRUD de productos con **regla de propiedad**.
-- [ ] Explorador con filtros y ficha de producto.
-- [ ] `@PreAuthorize` y guards por rol.
+- [x] Entidades `Shop`, `Product`, `Category`.
+- [x] Alta de vendedor (apertura de tienda).
+- [x] CRUD de productos con **regla de propiedad**.
+- [x] Explorador con filtros y ficha de producto.
+- [x] `@PreAuthorize` y guards por rol.
 
 ## M2 · Compra y reseñas — Semana 4
 **Carrito, checkout simulado y valoraciones**
