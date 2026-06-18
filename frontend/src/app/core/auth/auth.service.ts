@@ -4,10 +4,10 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TokenStorage } from './token.storage';
 
-export interface RegisterRequest { email: string; password: string; nombre: string; }
+export interface RegisterRequest { email: string; password: string; name: string; }
 export interface LoginRequest { email: string; password: string; }
-export interface AuthResponse { token: string; tipo: string; email: string; roles: string[]; }
-export interface Me { id: number; email: string; nombre: string; roles: string[]; }
+export interface AuthResponse { token: string; type: string; email: string; roles: string[]; }
+export interface Me { id: number; email: string; name: string; roles: string[]; }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

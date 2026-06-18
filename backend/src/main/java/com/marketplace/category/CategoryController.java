@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
-@Tag(name = "Categories", description = "Categorías de productos")
+@Tag(name = "Categories", description = "Product categories")
 public class CategoryController {
 
     private final CategoryRepository categoryRepository;
@@ -20,7 +20,7 @@ public class CategoryController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar todas las categorías")
+    @Operation(summary = "List all categories")
     public List<Category> list() {
         return categoryRepository.findAll();
     }

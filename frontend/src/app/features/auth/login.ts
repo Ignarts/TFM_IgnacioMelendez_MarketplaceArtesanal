@@ -14,7 +14,7 @@ import { AuthService } from '../../core/auth/auth.service';
       @if (error()) { <p class="error">{{ error() }}</p> }
       <button type="submit" [disabled]="form.invalid">Entrar</button>
     </form>
-    <p>¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+    <p>¿No tienes cuenta? <a routerLink="/register">Regístrate</a></p>
   `,
 })
 export class Login {
@@ -32,7 +32,7 @@ export class Login {
     if (this.form.invalid) return;
     this.error.set('');
     this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => this.router.navigate(['/perfil']),
+      next: () => this.router.navigate(['/profile']),
       error: () => this.error.set('Credenciales no válidas'),
     });
   }

@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-@Tag(name = "Products", description = "Explorador público de productos")
+@Tag(name = "Products", description = "Public product explorer")
 public class ProductController {
 
     private final ProductService productService;
@@ -20,7 +20,7 @@ public class ProductController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar productos con filtros opcionales")
+    @Operation(summary = "List products with optional filters")
     public List<ProductResponse> search(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) Long categoryId,
@@ -31,7 +31,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Ficha de un producto")
+    @Operation(summary = "Product detail")
     public ProductResponse get(@PathVariable Long id) {
         return ProductResponse.from(productService.getById(id));
     }

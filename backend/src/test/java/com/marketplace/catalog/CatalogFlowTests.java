@@ -25,7 +25,7 @@ class CatalogFlowTests {
 
     private String registerAndLogin(String email) throws Exception {
         mockMvc.perform(post("/api/auth/register").contentType(APPLICATION_JSON)
-                .content("{\"email\":\"" + email + "\",\"password\":\"password123\",\"nombre\":\"Test\"}"));
+                .content("{\"email\":\"" + email + "\",\"password\":\"password123\",\"name\":\"Test\"}"));
         String body = mockMvc.perform(post("/api/auth/login").contentType(APPLICATION_JSON)
                         .content("{\"email\":\"" + email + "\",\"password\":\"password123\"}"))
                 .andReturn().getResponse().getContentAsString();

@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ProblemDetail handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        problem.setTitle("Email ya registrado");
+        problem.setTitle("Email already registered");
         problem.setDetail(ex.getMessage());
         return problem;
     }
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ProblemDetail handleNotFound(NotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        problem.setTitle("Recurso no encontrado");
+        problem.setTitle("Resource not found");
         problem.setDetail(ex.getMessage());
         return problem;
     }
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     public ProblemDetail handleConflict(ConflictException ex) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        problem.setTitle("Conflicto");
+        problem.setTitle("Conflict");
         problem.setDetail(ex.getMessage());
         return problem;
     }
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ProblemDetail handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
-        problem.setTitle("Acceso denegado");
+        problem.setTitle("Access denied");
         problem.setDetail(ex.getMessage());
         return problem;
     }
@@ -51,15 +51,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail handleBadCredentials() {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        problem.setTitle("Credenciales inválidas");
-        problem.setDetail("Email o contraseña incorrectos");
+        problem.setTitle("Invalid credentials");
+        problem.setDetail("Incorrect email or password");
         return problem;
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ProblemDetail handleAuthentication(AuthenticationException ex) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        problem.setTitle("No autenticado");
+        problem.setTitle("Not authenticated");
         problem.setDetail(ex.getMessage());
         return problem;
     }
@@ -70,8 +70,8 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage,
                         (a, b) -> a));
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problem.setTitle("Error de validación");
-        problem.setProperties(Map.of("errores", errors));
+        problem.setTitle("Validation error");
+        problem.setProperties(Map.of("errors", errors));
         return problem;
     }
 }

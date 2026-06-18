@@ -20,7 +20,7 @@ public class UserService {
 
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     public boolean existsByEmail(String email) {

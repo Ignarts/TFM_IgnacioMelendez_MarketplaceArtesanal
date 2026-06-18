@@ -55,7 +55,7 @@ public class ProductService {
 
     public Product getById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -92,16 +92,16 @@ public class ProductService {
     /** Loads a product and enforces the ownership rule: it must belong to the seller's shop. */
     private Product getOwned(User seller, Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
         if (!product.getShop().getOwnerId().equals(seller.getId())) {
-            throw new AccessDeniedException("No puedes gestionar productos de otra tienda");
+            throw new AccessDeniedException("You cannot manage products from another shop");
         }
         return product;
     }
 
     private void apply(Product product, ProductRequest request) {
         Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new NotFoundException("Categoría no encontrada"));
+                .orElseThrow(() -> new NotFoundException("Category not found"));
         product.setCategory(category);
         product.setTitle(request.title());
         product.setDescription(request.description());

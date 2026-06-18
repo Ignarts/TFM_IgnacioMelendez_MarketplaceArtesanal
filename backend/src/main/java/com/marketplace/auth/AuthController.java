@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Auth", description = "Registro e inicio de sesión")
+@Tag(name = "Auth", description = "Registration and login")
 public class AuthController {
 
     private final AuthService authService;
@@ -22,13 +22,13 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Registrar nuevo usuario (rol BUYER por defecto)")
+    @Operation(summary = "Register a new user (BUYER role by default)")
     public void register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Iniciar sesión y obtener JWT")
+    @Operation(summary = "Log in and obtain a JWT")
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }

@@ -39,7 +39,7 @@ public class AuthService {
         User user = new User(
                 request.email(),
                 passwordEncoder.encode(request.password()),
-                request.nombre(),
+                request.name(),
                 Set.of(Role.BUYER)
         );
 

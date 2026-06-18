@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/seller/products")
-@Tag(name = "Seller products", description = "CRUD de productos del vendedor")
+@Tag(name = "Seller products", description = "Seller product CRUD")
 @SecurityRequirement(name = "bearerAuth")
 public class SellerProductController {
 
@@ -30,7 +30,7 @@ public class SellerProductController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar los productos de mi tienda")
+    @Operation(summary = "List my shop's products")
     public List<ProductResponse> list(@AuthenticationPrincipal UserDetails principal) {
         User seller = userService.getByEmail(principal.getUsername());
         return productService.listOwn(seller).stream().map(ProductResponse::from).toList();
@@ -38,7 +38,7 @@ public class SellerProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Crear producto en mi tienda")
+    @Operation(summary = "Create a product in my shop")
     public ProductResponse create(@AuthenticationPrincipal UserDetails principal,
                                   @Valid @RequestBody ProductRequest request) {
         User seller = userService.getByEmail(principal.getUsername());
@@ -46,7 +46,7 @@ public class SellerProductController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar un producto de mi tienda (regla de propiedad)")
+    @Operation(summary = "Update a product of my shop (ownership rule)")
     public ProductResponse update(@AuthenticationPrincipal UserDetails principal,
                                   @PathVariable Long id,
                                   @Valid @RequestBody ProductRequest request) {
@@ -56,7 +56,7 @@ public class SellerProductController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Eliminar un producto de mi tienda (regla de propiedad)")
+    @Operation(summary = "Delete a product of my shop (ownership rule)")
     public void delete(@AuthenticationPrincipal UserDetails principal, @PathVariable Long id) {
         User seller = userService.getByEmail(principal.getUsername());
         productService.delete(seller, id);

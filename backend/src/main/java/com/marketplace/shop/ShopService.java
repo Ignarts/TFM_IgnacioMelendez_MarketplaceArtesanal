@@ -27,7 +27,7 @@ public class ShopService {
     @Transactional
     public Shop openShop(User owner, CreateShopRequest request) {
         if (shopRepository.existsByOwnerId(owner.getId())) {
-            throw new ConflictException("El usuario ya tiene una tienda");
+            throw new ConflictException("User already owns a shop");
         }
 
         Shop shop = shopRepository.save(new Shop(owner.getId(), request.name(), request.description()));
@@ -40,6 +40,6 @@ public class ShopService {
 
     public Shop getByOwner(User owner) {
         return shopRepository.findByOwnerId(owner.getId())
-                .orElseThrow(() -> new NotFoundException("El usuario no tiene tienda"));
+                .orElseThrow(() -> new NotFoundException("User has no shop"));
     }
 }

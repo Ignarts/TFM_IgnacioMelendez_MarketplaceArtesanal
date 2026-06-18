@@ -1,7 +1,7 @@
 <nav>
   <a routerLink="/">Explorar</a>
   @if (auth.isLoggedIn()) {
-    <a routerLink="/perfil">Perfil</a>
+    <a routerLink="/profile">Perfil</a>
     @if (isSeller()) {
       <a routerLink="/mi-tienda">Mi tienda</a>
     } @else {
@@ -10,7 +10,7 @@
     <button type="button" (click)="logout()">Cerrar sesión</button>
   } @else {
     <a routerLink="/login">Login</a>
-    <a routerLink="/registro">Registro</a>
+    <a routerLink="/register">Registro</a>
   }
 </nav>
 <main>
