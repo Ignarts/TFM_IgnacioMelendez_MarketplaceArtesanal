@@ -1,24 +1,19 @@
-# Propuesta de TFM — Marketplace Artesanal
-
-**Autor:** Ignacio Meléndez
-**Fecha:** 17 de junio de 2026
-**Stack:** Spring Boot (backend) + Angular (frontend)
-
----
+> Autor: Ignacio Meléndez Uriz
+> Fecha: 23\06\2026
 
 ## 1. Qué es y qué hace la aplicación
 
 **Marketplace Artesanal** es una plataforma multivendedor inspirada en Etsy a pequeña escala.
 Artesanos (cerámica, joyería, cuero, ilustración, textil, madera…) publican sus productos y los
 compradores los descubren, valoran y adquieren mediante un **checkout simulado** (sin pasarela
-de pago real).
+de pago real para mantener el scope del proyecto lo más acotado y realista posible).
 
-Tiene dos rasgos que la diferencian de una tienda online convencional y que le dan entidad de TFM:
+Tiene dos rasgos que la diferencian de una tienda online convencional:
 
 1. **Un mismo usuario puede ejercer dos papeles.** Nace como comprador y puede darse de alta como
-   vendedor abriendo su propia tienda. Los roles son **acumulables**.
-2. **La confianza no la aporta una gran marca**, sino la *reputación* de cada pequeño vendedor,
-   construida por software. Este es el *twist* académico del proyecto (ver sección 8).
+   vendedor abriendo su propia tienda. Es decir, los roles son **acumulables**.
+2. **La confianza no la aporta una gran marca**, sino la _reputación_ de cada pequeño vendedor,
+   construida por software. Este es el _twist_ único del proyecto (ver sección 8).
 
 ### Funcionalidades dentro del alcance
 
@@ -48,18 +43,18 @@ Tiene dos rasgos que la diferencian de una tienda online convencional y que le d
 Un usuario nace como `BUYER` y puede añadir el rol `SELLER`. Los roles **suman** capacidades, no
 las restan: un vendedor o un admin también pueden comprar.
 
-| Capacidad | Comprador | Vendedor | Admin |
-|-----------|:---------:|:--------:|:-----:|
-| Explorar catálogo y buscar | ✅ | ✅ | ✅ |
-| Carrito y checkout | ✅ | ✅ | ✅ |
-| Reseñar lo comprado | ✅ | ✅ | ✅ |
-| Wishlist | ✅ | ✅ | ✅ |
-| Abrir tienda / CRUD productos | — | ✅ | — |
-| Panel de métricas de tienda | — | ✅ | — |
-| Gestionar pedidos recibidos | — | ✅ | — |
-| Verificar vendedores | — | — | ✅ |
-| Gestionar categorías globales | — | — | ✅ |
-| Moderar reseñas / suspender cuentas | — | — | ✅ |
+| Capacidad                           | Comprador | Vendedor | Admin |
+| ----------------------------------- | :-------: | :------: | :---: |
+| Explorar catálogo y buscar          |    ✅     |    ✅    |  ✅   |
+| Carrito y checkout                  |    ✅     |    ✅    |  ✅   |
+| Reseñar lo comprado                 |    ✅     |    ✅    |  ✅   |
+| Wishlist                            |    ✅     |    ✅    |  ✅   |
+| Abrir tienda / CRUD productos       |     —     |    ✅    |   —   |
+| Panel de métricas de tienda         |     —     |    ✅    |   —   |
+| Gestionar pedidos recibidos         |     —     |    ✅    |   —   |
+| Verificar vendedores                |     —     |    —     |  ✅   |
+| Gestionar categorías globales       |     —     |    —     |  ✅   |
+| Moderar reseñas / suspender cuentas |     —     |    —     |  ✅   |
 
 ---
 
@@ -67,45 +62,68 @@ las restan: un vendedor o un admin también pueden comprar.
 
 Arquitectura clásica de **tres capas desacopladas**: una SPA en Angular consume una API REST en
 Spring Boot, que persiste en una base de datos relacional. Una colección NoSQL opcional almacena
-eventos para analítica.
+eventos para analítica (si es necesario o da tiempo a implementar).
 
 ```
-┌─────────────────────────┐      ┌─────────────────────────┐      ┌─────────────────────────┐
-│  ① Cliente · Angular SPA │      │  ② API REST · Spring Boot │      │  ③ Persistencia          │
-│                          │ ⇄    │                          │ ⇄    │                          │
-│  Components              │ HTTP │  Controladores           │ JDBC │  MySQL (dominio)         │
-│  Router + Guards         │ JSON │   → Servicios            │      │  H2 (tests)              │
-│  Reactive Forms          │      │   → Repositorios         │      │  MongoDB (eventos, opc.) │
-│  RxJS                    │      │  Spring Security (JWT)   │      │                          │
-│  HttpClient + Interceptor│      │  Spring Data JPA         │      │                          │
-│  SCSS/SASS               │      │  Bean Validation         │      │                          │
-│                          │      │  @PreAuthorize · OpenAPI │      │                          │
-└─────────────────────────┘      └─────────────────────────┘      └─────────────────────────┘
+┌────────────────────────────────┐
+│  ① Cliente · Angular SPA       │
+│                                │
+│  Components                    │
+│  Router + Guards               │
+│  Reactive Forms                │
+│  RxJS                          │
+│  HttpClient + Interceptor      │
+│  SCSS/SASS                     │
+└────────────────────────────────┘
+            │  HTTP / JSON (<->)
+            |
+            Autor
+            ▼
+┌────────────────────────────────┐
+│  ② API REST · Spring Boot      │
+│                                │
+│  Controladores                 │
+│   → Servicios                  │
+│   → Repositorios               │
+│  Spring Security (JWT)         │
+│  Spring Data JPA               │
+│  Bean Validation               │
+│  @PreAuthorize · OpenAPI       │
+└────────────────────────────────┘
+            │  JDBC (<->)
+            ▼
+┌────────────────────────────────┐
+│  ③ Persistencia                │
+│                                │
+│  MySQL (dominio)               │
+│  H2 (tests)                    │
+│  MongoDB (eventos, opc.)       │
+└────────────────────────────────┘
 ```
 
 ### Stack tecnológico
 
-| Capa | Tecnologías |
-|------|-------------|
-| **Frontend** | Angular · Router + Guards · Reactive Forms · RxJS · HttpClient + Interceptor JWT · SCSS/SASS |
-| **Backend** | Java 17 · Spring Boot · Spring Web · Spring Security (JWT) · Spring Data JPA · Bean Validation · `@PreAuthorize` · Swagger/OpenAPI |
-| **Persistencia** | MySQL (dominio transaccional) · H2 (tests) · MongoDB (eventos, opcional) |
-| **Calidad y despliegue** | JUnit · Mockito · Jasmine/Karma · Docker · Docker Compose · CI básico |
+| Capa                     | Tecnologías                                                                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend**             | Angular · Router + Guards · Reactive Forms · RxJS · HttpClient + Interceptor JWT · SCSS/SASS                                       |
+| **Backend**              | Java 17 · Spring Boot · Spring Web · Spring Security (JWT) · Spring Data JPA · Bean Validation · `@PreAuthorize` · Swagger/OpenAPI |
+| **Persistencia**         | MySQL (dominio transaccional) · H2 (tests) · MongoDB (eventos, opcional)                                                           |
+| **Calidad y despliegue** | JUnit · Mockito · Jasmine/Karma · Docker · Docker Compose · CI básico                                                              |
 
 ### Decisiones clave
 
-| Decisión | Alternativa descartada | Justificación |
-|----------|------------------------|---------------|
-| **Monolito modular** | Microservicios | Alcance realista para un TFM y más fácil de defender. |
-| **MySQL para el dominio** | Solo NoSQL | El dominio es transaccional y relacional (pedidos, stock). |
-| **MongoDB solo para eventos** | Todo en MySQL | Encaja con agregaciones para analítica/reputación. |
-| **JWT stateless** | Sesiones de servidor | Encaja con SPA + REST; escala mejor y desacopla cliente/servidor. |
+| Decisión                      | Alternativa descartada | Justificación                                                     |
+| ----------------------------- | ---------------------- | ----------------------------------------------------------------- |
+| **Monolito modular**          | Microservicios         | Alcance realista para un TFM.                                     |
+| **MySQL para el dominio**     | Solo NoSQL             | El dominio es transaccional y relacional (pedidos, stock).        |
+| **MongoDB solo para eventos** | Todo en MySQL          | Encaja con agregaciones para analítica/reputación.                |
+| **JWT stateless**             | Sesiones de servidor   | Encaja con SPA + REST; escala mejor y desacopla cliente/servidor. |
 
 ---
 
 ## 4. Seguridad (front y back)
 
-Sí, **tanto el front como el back incluyen seguridad**. El backend es la autoridad; el frontend
+**Tanto el front como el back incluyen seguridad**. El backend es la autoridad; el frontend
 solo mejora la experiencia (oculta lo que el usuario no puede usar), nunca es la barrera real.
 
 ### En el backend
@@ -140,17 +158,17 @@ public ProductDTO updateProduct(Long productId, ProductUpdateDTO dto, User curre
 
 ### Matriz de endpoints (resumen)
 
-| Endpoint | Método | Acceso | Comprobación extra |
-|----------|--------|--------|--------------------|
-| `/api/products` | `GET` | PÚBLICO | — |
-| `/api/auth/register` · `/api/auth/login` | `POST` | PÚBLICO | — |
-| `/api/cart` · `/api/checkout` | `POST` | BUYER | — |
-| `/api/me/orders` | `GET` | BUYER | Solo sus pedidos |
-| `/api/products/{id}/reviews` | `POST` | BUYER | Solo si lo compró |
-| `/api/seller/products` | `POST` | SELLER | — |
-| `/api/seller/products/{id}` | `PUT` · `DELETE` | SELLER | **Producto de su tienda** |
-| `/api/admin/shops/{id}/verify` | `POST` | ADMIN | — |
-| `/api/admin/users/{id}/suspend` | `POST` | ADMIN | — |
+| Endpoint                                 | Método           | Acceso  | Comprobación extra        |
+| ---------------------------------------- | ---------------- | ------- | ------------------------- |
+| `/api/products`                          | `GET`            | PÚBLICO | —                         |
+| `/api/auth/register` · `/api/auth/login` | `POST`           | PÚBLICO | —                         |
+| `/api/cart` · `/api/checkout`            | `POST`           | BUYER   | —                         |
+| `/api/me/orders`                         | `GET`            | BUYER   | Solo sus pedidos          |
+| `/api/products/{id}/reviews`             | `POST`           | BUYER   | Solo si lo compró         |
+| `/api/seller/products`                   | `POST`           | SELLER  | —                         |
+| `/api/seller/products/{id}`              | `PUT` · `DELETE` | SELLER  | **Producto de su tienda** |
+| `/api/admin/shops/{id}/verify`           | `POST`           | ADMIN   | —                         |
+| `/api/admin/users/{id}/suspend`          | `POST`           | ADMIN   | —                         |
 
 ### Estrategia: RBAC + ownership
 
@@ -162,7 +180,7 @@ complementa con **comprobaciones de propiedad** a nivel de instancia. Esta combi
 
 ## 5. Docker
 
-Sí, se usa **Docker y Docker Compose**. El proyecto se orquesta como un monorepo con servicios
+Se usa **Docker y Docker Compose**. El proyecto se orquesta como un monorepo con servicios
 contenedorizados, lo que garantiza un **despliegue reproducible**.
 
 - `docker-compose.yml` levanta los servicios `api` (Spring Boot) + `mysql` (y `mongo` opcional).
@@ -170,19 +188,17 @@ contenedorizados, lo que garantiza un **despliegue reproducible**.
 - Un perfil de configuración específico (`application-docker.yml`) apunta a la base de datos
   dentro de la red de contenedores.
 
-> Estado actual: el `docker-compose` con `mysql` + `api` ya está implementado y funcionando.
-
 ---
 
 ## 6. Base de datos
 
-Se usa **persistencia políglota justificada**:
+Se usa **persistencia de datos** utilizando:
 
 - **MySQL** — base de datos principal para el **dominio transaccional**: usuarios, tiendas,
   productos, categorías, pedidos y reseñas. Es relacional porque el dominio lo es (integridad
   referencial, transacciones, stock).
 - **H2** en memoria — solo para los **tests** (arranque rápido, sin dependencias externas).
-- **MongoDB** *(opcional)* — para **eventos** (clics, búsquedas) que alimentan analítica y el
+- **MongoDB** _(opcional y si da tiempo)_ — para **eventos** (clics, búsquedas) que alimentan analítica y el
   sistema de reputación mediante el Aggregation Pipeline.
 
 El acceso a datos se hace con **Spring Data JPA** (repositorios) sobre MySQL.
@@ -207,12 +223,12 @@ parte de rendimiento (índices, paginación) conecta con el temario de búsqueda
 
 ---
 
-## 8. El *twist*: sistema de reputación y confianza
+## 8. El _twist_: sistema de reputación y confianza
 
-Lo que convierte un e-commerce en un TFM. Pregunta de investigación:
+El punto diferenciador frente a un e-commerce normal es el **Sistema de Reputación y Confianza**. Trata de responder a la pregunta:
 **¿cómo genera confianza una plataforma entre dos desconocidos?**
 
-Se diseña un **score de reputación (0–100)** por tienda que combina señales normalizadas:
+Para ello, se plantea el diseño de un **score de reputación (0–100)** por tienda que combina varias métricas:
 
 ```
 score = 0.40 · ratingMedioNorm     // calidad percibida (reseñas)
@@ -221,7 +237,7 @@ score = 0.40 · ratingMedioNorm     // calidad percibida (reseñas)
       - 0.10 · tasaIncidencias      // penalización por disputas
 ```
 
-Acompañado de:
+Una posibilidad a añadir si el tiempo lo permite es acompañarlo de:
 
 - **Insignias** (gamificación): Vendedor verificado, Artesano destacado (score > 85),
   Respuesta rápida (< 24 h), +100 ventas.
@@ -230,7 +246,7 @@ Acompañado de:
 - **Análisis comparativo** con plataformas reales (eBay, Wallapop, Etsy, Stack Overflow) sobre
   qué señales usan y cómo previenen el fraude.
 
-El cálculo puede hacerse *on-read* o mediante tareas programadas (`@Scheduled`), y los eventos
+El cálculo puede hacerse _on-read_ o mediante tareas programadas (`@Scheduled`), y los eventos
 que lo alimentan son un caso ideal para el Aggregation Pipeline de MongoDB.
 
 ---
@@ -239,30 +255,30 @@ que lo alimentan son un caso ideal para el Aggregation Pipeline de MongoDB.
 
 ### Entidades principales
 
-| Entidad | Campos clave |
-|---------|--------------|
-| **User** | `id` (PK), `email` (único), `passwordHash`, `nombre`, `roles[]` (`BUYER`/`SELLER`/`ADMIN`) |
-| **Shop** | `id` (PK), `ownerId` (FK→User), `nombre`, `descripcion`, `verificada` (bool) |
-| **Product** | `id` (PK), `shopId` (FK→Shop), `categoriaId` (FK→Category), `titulo`, `precio`, `stock`, `imagenes[]` |
-| **Category** | `id` (PK), `nombre`, `slug` |
-| **Order** | `id` (PK), `buyerId` (FK→User), `estado` (enum), `total`, `fecha` |
-| **OrderItem** | `id` (PK), `orderId` (FK→Order), `productId` (FK→Product), `precio` (congelado), `cantidad` |
-| **Review** | `id` (PK), `buyerId` (FK→User), `productId` (FK→Product), `rating` (1–5), `comentario`, `fecha` |
-| **Reputacion** ★ | `shopId` (FK→Shop), `score` (0–100), `nVentas`, `ratingMedio`, `insignias[]` |
+| Entidad          | Campos clave                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| **User**         | `id` (PK), `email` (único), `passwordHash`, `nombre`, `roles[]` (`BUYER`/`SELLER`/`ADMIN`)            |
+| **Shop**         | `id` (PK), `ownerId` (FK→User), `nombre`, `descripcion`, `verificada` (bool)                          |
+| **Product**      | `id` (PK), `shopId` (FK→Shop), `categoriaId` (FK→Category), `titulo`, `precio`, `stock`, `imagenes[]` |
+| **Category**     | `id` (PK), `nombre`, `slug`                                                                           |
+| **Order**        | `id` (PK), `buyerId` (FK→User), `estado` (enum), `total`, `fecha`                                     |
+| **OrderItem**    | `id` (PK), `orderId` (FK→Order), `productId` (FK→Product), `precio` (congelado), `cantidad`           |
+| **Review**       | `id` (PK), `buyerId` (FK→User), `productId` (FK→Product), `rating` (1–5), `comentario`, `fecha`       |
+| **Reputacion** ★ | `shopId` (FK→Shop), `score` (0–100), `nVentas`, `ratingMedio`, `insignias[]`                          |
 
 ### Relaciones
 
-| Relación | Cardinalidad |
-|----------|--------------|
-| User — Shop | 1:1 (un usuario tiene como mucho una tienda) |
-| Shop — Product | 1:N |
-| Category — Product | 1:N |
-| User (buyer) — Order | 1:N |
-| Order — OrderItem | 1:N |
-| Product — OrderItem | 1:N |
-| User — Review | 1:N |
-| Product — Review | 1:N |
-| Shop — Reputacion | 1:1 (agregado calculado) |
+| Relación             | Cardinalidad                                 |
+| -------------------- | -------------------------------------------- |
+| User — Shop          | 1:1 (un usuario tiene como mucho una tienda) |
+| Shop — Product       | 1:N                                          |
+| Category — Product   | 1:N                                          |
+| User (buyer) — Order | 1:N                                          |
+| Order — OrderItem    | 1:N                                          |
+| Product — OrderItem  | 1:N                                          |
+| User — Review        | 1:N                                          |
+| Product — Review     | 1:N                                          |
+| Shop — Reputacion    | 1:1 (agregado calculado)                     |
 
 ### Diagrama entidad-relación (resumen)
 
@@ -273,41 +289,18 @@ que lo alimentan son un caso ideal para el Aggregation Pipeline de MongoDB.
             owner 1:1│        1:N (buyer)
           ┌──────────┴───────────────┐
           ▼                          ▼
-      ┌────────┐                 ┌────────┐      1:N      ┌───────────┐
-      │  Shop  │                 │  Order │ ────────────▶ │ OrderItem │
-      └───┬────┘                 └────────┘               └─────┬─────┘
-   1:1 │  │ 1:N                                                 │ N:1
-       ▼  ▼                                                     ▼
- ┌──────────┐  ┌─────────┐    1:N   ┌──────────┐  N:1  ┌──────────┐
- │Reputacion│  │ Product │ ◀────────│  Review  │       │ Category │
- └──────────┘  └────┬────┘          └──────────┘       └────┬─────┘
-                    │ N:1                                    │ 1:N
-                    └────────────────────────────────────────┘
+      ┌────────┐                 ┌────────┐      1:N       ┌───────────┐
+      │  Shop  │                 │  Order │ ────────────>  │ OrderItem │
+      └───┬────┘                 └────────┘                └─────┬─────┘
+       ┌─────────────┐                                           |
+   1:1 │             │ 1:N                                       │ N:1
+       ▼             ▼                                           ▼
+ ┌──────────┐  ┌─────────┐    1:N   ┌──────────┐  N:1       ┌──────────┐
+ │Reputacion│  │ Product │ <────────│  Review  │            │ Category │
+ └──────────┘  └────┬────┘          └──────────┘            └────┬─────┘
+                    │ N:1                                        │ 1:N
+                    └────────────────────────────────────────────┘
 ```
 
-> Nota: el `precio` se **congela** en `OrderItem` en el momento de la compra para que cambios
+> Nota: el `precio` se **"congela"** en `OrderItem` en el momento de la compra para que cambios
 > posteriores en `Product.precio` no alteren pedidos históricos.
-
----
-
-## 10. Planificación (roadmap orientativo)
-
-| Hito | Semana(s) | Contenido |
-|------|-----------|-----------|
-| **M0 · Cimientos** | 1 | Setup Spring Boot + Angular, Docker Compose (api + MySQL), entidad `User`, registro/login con JWT, guards básicos. **(ya hecho)** |
-| **M1 · Catálogo y tiendas** | 2–3 | Entidades `Shop`/`Product`/`Category`, alta de vendedor, CRUD con regla de propiedad, explorador con filtros, `@PreAuthorize` y guards por rol. |
-| **M2 · Compra y reseñas** | 4 | Entidades `Order`/`OrderItem`/`Review`, carrito y checkout simulado, ciclo de estados, histórico, reseñas verificadas. |
-| **M3 · Twist + calidad** | 5–6 | Entidad `Reputacion` y cálculo del score, insignias y antifraude, panel admin, tests (JUnit/Mockito, Jasmine/Karma), CI básico, análisis comparativo. |
-
----
-
-## 11. Estado actual del proyecto
-
-Ya implementado (hito M0):
-
-- Esqueleto de backend Spring Boot con Java 17.
-- `docker-compose` con servicios `mysql` + `api` funcionando.
-- Entidad `User`, enum `Role`, repositorio y servicio de usuarios.
-- Capa de seguridad JWT: `JwtService`, filtro de autenticación, `SecurityConfig`.
-- Endpoints `/api/auth/register` y `/api/auth/login` que devuelven JWT.
-- Endpoint protegido `/api/me` y esquema *bearer* en Swagger/OpenAPI.
