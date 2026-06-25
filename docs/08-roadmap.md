@@ -35,11 +35,11 @@ Aquí se materializa la seguridad por roles y la regla de propiedad.
 Carrito, pedido con estados, histórico del comprador, panel del vendedor con sus pedidos, y
 reseñas verificadas (solo quien compró).
 
-- [ ] Entidades `Order`, `OrderItem`, `Review`.
-- [ ] Carrito y checkout simulado.
-- [ ] Ciclo de estados del pedido.
-- [ ] Histórico del comprador y panel del vendedor.
-- [ ] Reseñas verificadas.
+- [x] Entidades `Order`, `OrderItem`, `Review`.
+- [x] Carrito y checkout simulado.
+- [x] Ciclo de estados del pedido.
+- [x] Histórico del comprador y panel del vendedor.
+- [x] Reseñas verificadas.
 
 ## M3 · Twist + calidad — Semanas 5-6
 **Reputación, tests y memoria**

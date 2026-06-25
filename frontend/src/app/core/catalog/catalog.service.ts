@@ -31,6 +31,17 @@ export interface ProductRequest {
 
 export interface ProductFilters { q?: string; categoryId?: number; minPrice?: number; maxPrice?: number; }
 
+export interface Review {
+  id: number;
+  productId: number;
+  buyerName: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+}
+
+export interface ReviewRequest { rating: number; comment?: string | null; }
+
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
   private http = inject(HttpClient);
@@ -78,5 +89,14 @@ export class CatalogService {
 
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/seller/products/${id}`);
+  }
+
+  // Reviews
+  reviews(productId: number): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.base}/products/${productId}/reviews`);
+  }
+
+  createReview(productId: number, req: ReviewRequest): Observable<Review> {
+    return this.http.post<Review>(`${this.base}/products/${productId}/reviews`, req);
   }
 }

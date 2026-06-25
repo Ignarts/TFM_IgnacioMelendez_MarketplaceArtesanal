@@ -25,6 +25,19 @@ nav a:first-child {
   border-bottom: none;
 }
 
+.cart-count {
+  display: inline-block;
+  min-width: 1.2rem;
+  padding: 0 0.35rem;
+  margin-left: 0.3rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--eggplant-900);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 nav button {
   margin-left: auto;
   background: transparent;
