@@ -9,4 +9,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByProductIdOrderByCreatedAtDesc(Long productId);
 
     boolean existsByProductIdAndBuyerId(Long productId, Long buyerId);
+
+    @org.springframework.data.jpa.repository.Query(
+            "SELECT AVG(r.rating) FROM Review r WHERE r.product.shop.id = :shopId")
+    java.math.BigDecimal avgRatingByShopId(@org.springframework.data.repository.query.Param("shopId") Long shopId);
+
+    /** Suspicious pattern: same buyer leaving many reviews in the same shop recently. */
+    @org.springframework.data.jpa.repository.Query(
+            "SELECT COUNT(r) FROM Review r WHERE r.product.shop.id = :shopId " +
+            "AND r.buyerId = :buyerId AND r.createdAt >= :since")
+    long countRecentReviewsByBuyerInShop(
+            @org.springframework.data.repository.query.Param("shopId") Long shopId,
+            @org.springframework.data.repository.query.Param("buyerId") Long buyerId,
+            @org.springframework.data.repository.query.Param("since") java.time.Instant since);
 }

@@ -33,5 +33,10 @@ export const routes: Routes = [
     canActivate: [roleGuard('SELLER')],
     loadComponent: () => import('./features/seller/mi-tienda').then((m) => m.MiTienda),
   },
+  {
+    path: 'admin',
+    canActivate: [roleGuard('ADMIN')],
+    loadComponent: () => import('./features/admin/admin-panel').then((m) => m.AdminPanel),
+  },
   { path: '**', redirectTo: '' },
 ];
