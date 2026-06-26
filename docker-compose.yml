@@ -27,8 +27,18 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-marketplace}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      # Set APP_SEED_DEMO=true to load fake shops/products on startup (demo only).
+      APP_SEED_DEMO: ${APP_SEED_DEMO:-false}
     ports:
       - "8080:8080"
+
+  # Lightweight web UI to inspect the database at http://localhost:8082
+  adminer:
+    image: adminer:4
+    depends_on:
+      - mysql
+    ports:
+      - "8082:8080"
 
 volumes:
   mysql-data:
