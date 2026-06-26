@@ -2,12 +2,14 @@ package com.marketplace.category;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /** Seeds the fixed set of craft categories on startup if the table is empty. */
 @Component
+@Order(1) // before any runner that depends on categories (e.g. the demo data seeder)
 public class CategorySeeder implements ApplicationRunner {
 
     private final CategoryRepository categoryRepository;

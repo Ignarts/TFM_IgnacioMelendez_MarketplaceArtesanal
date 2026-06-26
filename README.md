@@ -165,6 +165,41 @@ curl -X POST localhost:8080/api/products/$PID/reviews -H "Authorization: Bearer 
   -H "Content-Type: application/json" -d '{"rating":5,"comment":"Preciosa"}'
 ```
 
+## 🌱 Datos de demostración
+
+Para poblar el catálogo con tiendas y productos falsos (solo demo/desarrollo):
+
+```bash
+APP_SEED_DEMO=true docker compose up --build
+```
+
+- `DemoDataSeeder` (`backend/.../dev`) crea 10 tiendas y ~70 productos. Está **desactivado por
+  defecto** (`@ConditionalOnProperty app.seed-demo`), no se ejecuta en tests y es **idempotente**
+  (no resiembra si ya existe el usuario demo). Los vendedores demo usan la contraseña `password123`.
+- **Adminer** (visor web de la BBDD) queda disponible en http://localhost:8082 — motor `MySQL`,
+  servidor `mysql`, usuario/contraseña/BBDD `marketplace`.
+
+### Obtención de imágenes de producto
+
+Las imágenes de los productos demo son **fotos reales de [Wikimedia Commons](https://commons.wikimedia.org)**
+(CDN estable `upload.wikimedia.org`, contenido de libre uso), no placeholders.
+
+- En `DemoDataSeeder` cada producto tiene una **palabra clave** en inglés (`vase`, `wallet`,
+  `sweater`…). Un mapa estático `IMAGE_BY_KEYWORD` asocia cada palabra clave a una URL concreta de
+  Commons, de modo que la imagen **se corresponde** con el producto.
+- Esas URLs se obtuvieron **una sola vez** consultando la API de búsqueda de Commons
+  (`action=query&generator=search … prop=imageinfo`), filtrando a imágenes raster cuyo **título de
+  archivo contiene el objeto** buscado (para descartar resultados irrelevantes) y quedándose con la
+  primera coincidencia. El resultado se **incrustó como literales** en el seeder: en arranque no se
+  llama a ninguna API externa.
+- Las pocas palabras clave sin foto exacta reutilizan una imagen de **su misma categoría**; si
+  faltara alguna, hay _fallback_ a un placeholder con el nombre del producto.
+- Se hace **hotlink** directo al CDN de Wikimedia (suficiente para una demo). Para independencia
+  total de la red habría que descargar las imágenes a `assets/` y servirlas localmente.
+
+> ⚠️ Como las URLs apuntan a archivos concretos de Commons, si alguno se renombra o retira en el
+> futuro esa imagen dejaría de cargar; bastaría con re-obtener esa entrada del mapa.
+
 ## 📚 Documentación
 
 La documentación completa está en [`docs/`](docs/README.md). Puntos de entrada recomendados:
