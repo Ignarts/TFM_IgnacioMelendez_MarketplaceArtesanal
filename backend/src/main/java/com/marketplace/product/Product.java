@@ -47,7 +47,7 @@ public class Product {
     // ponytail: image URLs only, no file upload until the project needs it
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "url")
+    @Column(name = "url", length = 1000) // image URLs can be long (e.g. CDN thumbnails)
     private List<String> images = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
