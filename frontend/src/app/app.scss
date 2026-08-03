@@ -12,6 +12,8 @@ nav {
 nav a, nav button {
   color: #f3e7ef;
   border-radius: 8px;
+  background: transparent;
+  border: none;
 }
 nav a svg, nav button svg { width: 20px; height: 20px; }
 nav a:hover, nav button:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
@@ -19,21 +21,7 @@ nav a:hover, nav button:hover { color: #fff; background: rgba(255, 255, 255, 0.1
 /* Pushes this link and everything after it to the right edge of the nav */
 .nav-right-start { margin-left: auto; }
 
-/* Icon-only nav items */
-.nav-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-}
-
-nav button.nav-icon {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-/* Icon + label stacked nav items (Carrito, Login, Registro) */
+/* Icon + label stacked nav items (Carrito, Pedidos, Perfil, Login, Registro...) */
 .nav-item {
   position: relative;
   display: inline-flex;
