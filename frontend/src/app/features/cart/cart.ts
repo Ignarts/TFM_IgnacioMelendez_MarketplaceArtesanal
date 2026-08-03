@@ -102,9 +102,9 @@ const FREE_SHIPPING_FROM = 50;
     .actions { display: flex; align-items: center; gap: 1.25rem; }
     .link-button {
       display: inline-block; padding: 0.55rem 1.1rem; border-radius: 999px;
-      background: var(--eggplant-700); color: #fff;
+      background: var(--brown-700); color: #fff;
     }
-    .link-button:hover { background: var(--eggplant-600); color: #fff; }
+    .link-button:hover { background: var(--brown-600); color: #fff; }
 
     .cart-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; }
     .cart-row {

@@ -179,7 +179,7 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
     .gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .gallery-main.placeholder {
       display: flex; align-items: center; justify-content: center;
-      color: var(--muted); background: #f1e9ee;
+      color: var(--muted); background: #f2e9db;
     }
     .gallery-main.placeholder svg { width: 48px; height: 48px; }
 
@@ -204,15 +204,15 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
       background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 0.75rem 1rem; margin-bottom: 1.25rem;
     }
-    .shop-name { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; color: var(--eggplant-700); }
+    .shop-name { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; color: var(--brown-700); }
     .shop-name svg { width: 18px; height: 18px; }
     .rep-score {
-      font-size: 0.8rem; background: var(--eggplant-700); color: #fff;
+      font-size: 0.8rem; background: var(--brown-700); color: #fff;
       border-radius: 999px; padding: 2px 9px; font-weight: 600;
     }
     .badge {
       display: inline-flex; align-items: center; gap: 0.3rem;
-      font-size: 0.75rem; background: #f1e9ee; color: var(--eggplant-700);
+      font-size: 0.75rem; background: #f2e9db; color: var(--brown-700);
       border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px;
     }
     .badge svg { width: 13px; height: 13px; }
