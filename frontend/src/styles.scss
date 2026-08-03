@@ -152,11 +152,3 @@ input:focus, select:focus, textarea:focus {
 .grid h3 { margin: 0.75rem 0.85rem 0.25rem; }
 .grid p { margin: 0 0.85rem; font-weight: 600; color: var(--gold-dark); }
 .grid small { display: block; margin: 0.25rem 0.85rem 0.85rem; }
-
-/* ---- Product detail ---- */
-.price { font-size: 1.5rem; font-weight: 700; color: var(--gold-dark); }
-.images { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0; }
-.images img {
-  width: 180px; height: 135px; object-fit: cover;
-  border-radius: var(--radius); border: 1px solid var(--border);
-}
