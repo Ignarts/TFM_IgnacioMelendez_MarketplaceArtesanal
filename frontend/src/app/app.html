@@ -1,22 +1,51 @@
 <nav>
-  <a routerLink="/">Explorar</a>
-  <a routerLink="/carrito">Carrito@if (cart.count() > 0) { <span class="cart-count">{{ cart.count() }}</span> }</a>
+  <a routerLink="/" class="brand" aria-label="Marketplace Artesanal">
+    <svg lucideCompass></svg>
+    <span>Marketplace Artesanal</span>
+  </a>
+  <a routerLink="/carrito" class="nav-item nav-right-start" aria-label="Carrito">
+    <span class="icon-wrap">
+      <svg lucideShoppingCart></svg>
+      @if (cart.count() > 0) { <span class="cart-count">{{ cart.count() }}</span> }
+    </span>
+    <span class="nav-label">Carrito</span>
+  </a>
   @if (auth.isLoggedIn()) {
-    <a routerLink="/pedidos">Mis pedidos</a>
-    <a routerLink="/profile">Perfil</a>
+    <a routerLink="/pedidos" class="nav-icon" title="Mis pedidos" aria-label="Mis pedidos">
+      <svg lucidePackage></svg>
+    </a>
+    <a routerLink="/profile" class="nav-icon" title="Perfil" aria-label="Perfil">
+      <svg lucideCircleUser></svg>
+    </a>
     @if (isSeller()) {
-      <a routerLink="/mi-tienda">Mi tienda</a>
-      <a routerLink="/mis-ventas">Mis ventas</a>
+      <a routerLink="/mi-tienda" class="nav-icon" title="Mi tienda" aria-label="Mi tienda">
+        <svg lucideStore></svg>
+      </a>
+      <a routerLink="/mis-ventas" class="nav-icon" title="Mis ventas" aria-label="Mis ventas">
+        <svg lucideChartColumn></svg>
+      </a>
     } @else {
-      <a routerLink="/vender">Vender</a>
+      <a routerLink="/vender" class="nav-icon" title="Vender" aria-label="Vender">
+        <svg lucideStore></svg>
+      </a>
     }
     @if (isAdmin()) {
-      <a routerLink="/admin">Admin</a>
+      <a routerLink="/admin" class="nav-icon" title="Admin" aria-label="Admin">
+        <svg lucideShieldCheck></svg>
+      </a>
     }
-    <button type="button" (click)="logout()">Cerrar sesión</button>
+    <button type="button" (click)="logout()" class="nav-icon" title="Cerrar sesión" aria-label="Cerrar sesión">
+      <svg lucideLogOut></svg>
+    </button>
   } @else {
-    <a routerLink="/login">Login</a>
-    <a routerLink="/register">Registro</a>
+    <a routerLink="/login" class="nav-item" aria-label="Login">
+      <svg lucideLogIn></svg>
+      <span class="nav-label">Login</span>
+    </a>
+    <a routerLink="/register" class="nav-item" aria-label="Registro">
+      <svg lucideUserPlus></svg>
+      <span class="nav-label">Registro</span>
+    </a>
   }
 </nav>
 <main>

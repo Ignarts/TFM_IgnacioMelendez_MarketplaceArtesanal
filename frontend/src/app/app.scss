@@ -9,42 +9,69 @@ nav {
   box-shadow: var(--shadow);
 }
 
-nav a {
+nav a, nav button {
   color: #f3e7ef;
-  font-weight: 500;
-  padding-bottom: 2px;
-  border-bottom: 2px solid transparent;
+  border-radius: 8px;
 }
-nav a:hover { color: #fff; border-bottom-color: var(--gold); }
+nav a svg, nav button svg { width: 20px; height: 20px; }
+nav a:hover, nav button:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
 
-/* First link acts as the brand */
-nav a:first-child {
-  font-family: var(--serif);
-  font-size: 1.15rem;
-  color: var(--gold);
-  border-bottom: none;
+/* Pushes this link and everything after it to the right edge of the nav */
+.nav-right-start { margin-left: auto; }
+
+/* Icon-only nav items */
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
 }
+
+nav button.nav-icon {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Icon + label stacked nav items (Carrito, Login, Registro) */
+.nav-item {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.nav-item .icon-wrap { position: relative; display: inline-flex; }
 
 .cart-count {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.3rem;
   display: inline-block;
   min-width: 1.2rem;
-  padding: 0 0.35rem;
-  margin-left: 0.3rem;
+  padding: 0 0.3rem;
   border-radius: 999px;
   background: var(--gold);
   color: var(--eggplant-900);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-align: center;
+  line-height: 1.2rem;
 }
 
-nav button {
-  margin-left: auto;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #f3e7ef;
+/* Site logo: icon + name */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gold);
+  font-family: var(--serif);
+  font-size: 1.05rem;
 }
-nav button:hover { background: rgba(255, 255, 255, 0.12); }
+.brand:hover { color: var(--gold); background: none; }
 
 main {
   max-width: var(--container);

@@ -1,11 +1,36 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import {
+  LucideChartColumn,
+  LucideCircleUser,
+  LucideCompass,
+  LucideLogIn,
+  LucideLogOut,
+  LucidePackage,
+  LucideShieldCheck,
+  LucideShoppingCart,
+  LucideStore,
+  LucideUserPlus,
+} from '@lucide/angular';
 import { AuthService } from './core/auth/auth.service';
 import { OrderService } from './core/order/order.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    LucideChartColumn,
+    LucideCircleUser,
+    LucideCompass,
+    LucideLogIn,
+    LucideLogOut,
+    LucidePackage,
+    LucideShieldCheck,
+    LucideShoppingCart,
+    LucideStore,
+    LucideUserPlus,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
