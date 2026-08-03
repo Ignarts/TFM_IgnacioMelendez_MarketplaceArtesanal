@@ -1,9 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { SlicePipe } from '@angular/common';
 import { AdminService, AdminShop, AdminUser } from '../../core/admin/admin.service';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [],
+  imports: [SlicePipe],
   template: `
     <h1>Panel de administración</h1>
 
