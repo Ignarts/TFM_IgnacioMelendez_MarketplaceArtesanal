@@ -103,6 +103,14 @@ public class AdminController {
 
     // ── Reviews ──────────────────────────────────────────────────────────────
 
+    @GetMapping("/reviews")
+    @Operation(summary = "List all reviews, most recent first")
+    public List<AdminReviewDto> listReviews() {
+        return reviewRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(AdminReviewDto::from)
+                .toList();
+    }
+
     @DeleteMapping("/reviews/{id}")
     @Transactional
     @Operation(summary = "Moderate (delete) a reported review")

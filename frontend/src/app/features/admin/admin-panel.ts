@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { SlicePipe } from '@angular/common';
-import { AdminService, AdminShop, AdminUser } from '../../core/admin/admin.service';
+import { AdminService, AdminReview, AdminShop, AdminUser } from '../../core/admin/admin.service';
 
 @Component({
   selector: 'app-admin-panel',
@@ -58,6 +58,30 @@ import { AdminService, AdminShop, AdminUser } from '../../core/admin/admin.servi
       }
     </section>
 
+    <section>
+      <h2>Reseñas reportadas</h2>
+      @if (reviews().length === 0) {
+        <p>No hay reseñas.</p>
+      } @else {
+        <table>
+          <thead><tr><th>ID</th><th>Producto</th><th>Autor</th><th>Nota</th><th>Comentario</th><th>Fecha</th><th>Acción</th></tr></thead>
+          <tbody>
+            @for (review of reviews(); track review.id) {
+              <tr>
+                <td>{{ review.id }}</td>
+                <td>{{ review.productTitle }}</td>
+                <td>{{ review.buyerName }}</td>
+                <td>{{ review.rating }}</td>
+                <td>{{ review.comment }}</td>
+                <td>{{ review.createdAt | slice:0:10 }}</td>
+                <td><button (click)="deleteReview(review)">Eliminar</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
     @if (message()) { <p class="success">{{ message() }}</p> }
     @if (error()) { <p class="error">{{ error() }}</p> }
   `,
@@ -67,12 +91,14 @@ export class AdminPanel implements OnInit {
 
   pendingShops = signal<AdminShop[]>([]);
   users = signal<AdminUser[]>([]);
+  reviews = signal<AdminReview[]>([]);
   message = signal('');
   error = signal('');
 
   ngOnInit(): void {
     this.loadPendingShops();
     this.loadUsers();
+    this.loadReviews();
   }
 
   private loadPendingShops(): void {
@@ -86,6 +112,13 @@ export class AdminPanel implements OnInit {
     this.adminService.listUsers().subscribe({
       next: (users) => this.users.set(users),
       error: () => this.error.set('Error al cargar usuarios.'),
+    });
+  }
+
+  private loadReviews(): void {
+    this.adminService.listReviews().subscribe({
+      next: (reviews) => this.reviews.set(reviews),
+      error: () => this.error.set('Error al cargar reseñas.'),
     });
   }
 
@@ -116,6 +149,16 @@ export class AdminPanel implements OnInit {
         this.message.set(`Usuario "${user.name}" reactivado.`);
       },
       error: () => this.error.set('Error al reactivar usuario.'),
+    });
+  }
+
+  deleteReview(review: AdminReview): void {
+    this.adminService.deleteReview(review.id).subscribe({
+      next: () => {
+        this.reviews.update((list) => list.filter((r) => r.id !== review.id));
+        this.message.set(`Reseña de "${review.buyerName}" eliminada.`);
+      },
+      error: () => this.error.set('Error al eliminar la reseña.'),
     });
   }
 }

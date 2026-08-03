@@ -20,6 +20,16 @@ export interface AdminUser {
   createdAt: string;
 }
 
+export interface AdminReview {
+  id: number;
+  productId: number;
+  productTitle: string;
+  buyerName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private http = inject(HttpClient);
@@ -47,6 +57,10 @@ export class AdminService {
 
   unsuspendUser(userId: number): Observable<AdminUser> {
     return this.http.post<AdminUser>(`${this.base}/users/${userId}/unsuspend`, {});
+  }
+
+  listReviews(): Observable<AdminReview[]> {
+    return this.http.get<AdminReview[]>(`${this.base}/reviews`);
   }
 
   deleteReview(reviewId: number): Observable<void> {

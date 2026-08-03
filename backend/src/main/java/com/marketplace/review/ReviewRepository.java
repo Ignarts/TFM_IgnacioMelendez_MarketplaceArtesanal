@@ -8,6 +8,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findByProductIdOrderByCreatedAtDesc(Long productId);
 
+    List<Review> findAllByOrderByCreatedAtDesc();
+
     boolean existsByProductIdAndBuyerId(Long productId, Long buyerId);
 
     @org.springframework.data.jpa.repository.Query(

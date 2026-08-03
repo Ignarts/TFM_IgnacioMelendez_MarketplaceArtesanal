@@ -118,4 +118,58 @@ class AdminFlowTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.suspended").value(false));
     }
+
+    @Test
+    void adminCanListAndDeleteReview() throws Exception {
+        String sellerEmail = "seller_review_" + System.nanoTime() + "@test.com";
+        mockMvc.perform(post("/api/auth/register").contentType(APPLICATION_JSON)
+                .content("{\"email\":\"" + sellerEmail + "\",\"password\":\"password123\",\"name\":\"Seller\"}"));
+        String sellerToken = login(sellerEmail, "password123");
+        mockMvc.perform(post("/api/seller/shop").header(AUTHORIZATION, bearer(sellerToken))
+                .contentType(APPLICATION_JSON).content("{\"name\":\"Tienda\"}"));
+        String categories = mockMvc.perform(get("/api/categories"))
+                .andReturn().getResponse().getContentAsString();
+        long categoryId = mapper.readTree(categories).get(0).get("id").asLong();
+        String created = mockMvc.perform(post("/api/seller/products").header(AUTHORIZATION, bearer(sellerToken))
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"title\":\"Vasija\",\"price\":20,\"stock\":5,\"categoryId\":" + categoryId + "}"))
+                .andReturn().getResponse().getContentAsString();
+        long productId = mapper.readTree(created).get("id").asLong();
+
+        String buyerEmail = "buyer_review_" + System.nanoTime() + "@test.com";
+        mockMvc.perform(post("/api/auth/register").contentType(APPLICATION_JSON)
+                .content("{\"email\":\"" + buyerEmail + "\",\"password\":\"password123\",\"name\":\"Buyer\"}"));
+        String buyerToken = login(buyerEmail, "password123");
+
+        String orders = mockMvc.perform(post("/api/orders").header(AUTHORIZATION, bearer(buyerToken))
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"items\":[{\"productId\":" + productId + ",\"quantity\":1}]}"))
+                .andReturn().getResponse().getContentAsString();
+        long orderId = mapper.readTree(orders).get(0).get("id").asLong();
+        mockMvc.perform(post("/api/orders/" + orderId + "/pay").header(AUTHORIZATION, bearer(buyerToken)));
+        mockMvc.perform(post("/api/seller/orders/" + orderId + "/ship").header(AUTHORIZATION, bearer(sellerToken)));
+        mockMvc.perform(post("/api/orders/" + orderId + "/confirm").header(AUTHORIZATION, bearer(buyerToken)));
+
+        String review = mockMvc.perform(post("/api/products/" + productId + "/reviews")
+                        .header(AUTHORIZATION, bearer(buyerToken))
+                        .contentType(APPLICATION_JSON).content("{\"rating\":1,\"comment\":\"Spam\"}"))
+                .andReturn().getResponse().getContentAsString();
+        long reviewId = mapper.readTree(review).get("id").asLong();
+
+        String adminToken = createAdminAndLogin();
+
+        mockMvc.perform(get("/api/admin/reviews")
+                        .header(AUTHORIZATION, bearer(adminToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + reviewId + ")].comment").value("Spam"));
+
+        mockMvc.perform(delete("/api/admin/reviews/" + reviewId)
+                        .header(AUTHORIZATION, bearer(adminToken)))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/admin/reviews")
+                        .header(AUTHORIZATION, bearer(adminToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + reviewId + ")]").isEmpty());
+    }
 }
