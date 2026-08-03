@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { CatalogService, Product, Review } from '../../core/catalog/catalog.service';
 import { OrderService } from '../../core/order/order.service';
+import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputation/reputation.service';
 
 @Component({
   selector: 'app-producto',
@@ -26,7 +27,16 @@ import { OrderService } from '../../core/order/order.service';
       }
       <p>{{ p.description }}</p>
       <ul>
-        <li><strong>Tienda:</strong> {{ p.shopName }}</li>
+        <li><strong>Tienda:</strong> {{ p.shopName }}
+          @if (reputation(); as rep) {
+            <span class="rep-score" title="Puntuación de reputación">
+              {{ rep.score }}/100
+            </span>
+            @for (badge of rep.badges; track badge) {
+              <span class="badge">{{ badgeLabel(badge) }}</span>
+            }
+          }
+        </li>
         <li><strong>Categoría:</strong> {{ p.categoryName }}</li>
         <li><strong>Stock:</strong> {{ p.stock }}</li>
       </ul>
@@ -94,6 +104,8 @@ import { OrderService } from '../../core/order/order.service';
     .review-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
     .verified { font-size: 0.78rem; color: #2f7a43; }
     .stars { color: var(--gold); letter-spacing: 2px; }
+    .rep-score { font-size: 0.8rem; background: var(--primary); color: #fff; border-radius: 4px; padding: 1px 6px; margin-left: 8px; }
+    .badge { font-size: 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1px 8px; margin-left: 4px; }
   `,
 })
 export class Producto implements OnInit {
@@ -101,10 +113,12 @@ export class Producto implements OnInit {
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private cart = inject(OrderService);
+  private reputationService = inject(ReputationService);
   auth = inject(AuthService);
 
   product = signal<Product | null>(null);
   reviews = signal<Review[]>([]);
+  reputation = signal<Reputation | null>(null);
   notFound = signal(false);
   quantity = signal(1);
   added = signal(false);
@@ -123,7 +137,13 @@ export class Producto implements OnInit {
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.catalog.product(id).subscribe({
-      next: (p) => this.product.set(p),
+      next: (p) => {
+        this.product.set(p);
+        this.reputationService.getReputation(p.shopId).subscribe({
+          next: (rep) => this.reputation.set(rep),
+          error: () => {},
+        });
+      },
       error: () => this.notFound.set(true),
     });
     this.loadReviews(id);
@@ -131,6 +151,10 @@ export class Producto implements OnInit {
 
   loadReviews(id: number) {
     this.catalog.reviews(id).subscribe((r) => this.reviews.set(r));
+  }
+
+  badgeLabel(badge: string): string {
+    return BADGE_LABELS[badge as keyof typeof BADGE_LABELS] ?? badge;
   }
 
   stars(rating: number) {

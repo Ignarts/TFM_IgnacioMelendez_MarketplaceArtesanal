@@ -24,6 +24,10 @@ public class AppUserDetailsService implements UserDetailsService {
                 .map(user -> new org.springframework.security.core.userdetails.User(
                         user.getEmail(),
                         user.getPasswordHash(),
+                        /* enabled */ !user.isSuspended(),
+                        /* accountNonExpired */ true,
+                        /* credentialsNonExpired */ true,
+                        /* accountNonLocked */ !user.isSuspended(),
                         user.getRoles().stream()
                                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                                 .collect(Collectors.toSet())

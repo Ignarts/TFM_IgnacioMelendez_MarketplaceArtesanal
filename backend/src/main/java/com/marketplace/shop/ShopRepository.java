@@ -9,4 +9,6 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
     Optional<Shop> findByOwnerId(Long ownerId);
 
     boolean existsByOwnerId(Long ownerId);
+
+    java.util.List<Shop> findByVerifiedFalse();
 }

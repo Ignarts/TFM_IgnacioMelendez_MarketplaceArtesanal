@@ -9,4 +9,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByBuyerIdOrderByCreatedAtDesc(Long buyerId);
 
     List<Order> findByShopIdOrderByCreatedAtDesc(Long shopId);
+
+    long countByShopIdAndStatus(Long shopId, OrderStatus status);
+
+    long countByShopId(Long shopId);
 }

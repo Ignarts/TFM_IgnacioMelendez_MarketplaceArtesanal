@@ -55,6 +55,8 @@ public class SecurityConfig {
                         ).permitAll()
                         // Public catalog browsing
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
+                        // Reputation is public (displayed on shop/product pages)
+                        .requestMatchers(HttpMethod.GET, "/api/shops/*/reputation").permitAll()
                         .anyRequest().authenticated()
                 )
                 // No token → 401 (not 403, which is Spring's default for anonymous requests)

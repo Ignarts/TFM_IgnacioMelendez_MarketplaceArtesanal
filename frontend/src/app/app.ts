@@ -15,6 +15,7 @@ export class App {
   private router = inject(Router);
 
   isSeller = computed(() => this.auth.user()?.roles.includes('SELLER') ?? false);
+  isAdmin = computed(() => this.auth.user()?.roles.includes('ADMIN') ?? false);
 
   constructor() {
     // Load roles for the navbar when a session already exists (e.g. after a reload).
