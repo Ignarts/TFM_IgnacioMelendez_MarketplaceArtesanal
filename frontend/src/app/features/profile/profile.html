@@ -1,0 +1,53 @@
+@if (auth.user(); as u) {
+  <section class="profile">
+    <header class="profile__hero">
+      <div class="profile__avatar" aria-hidden="true">{{ initials(u.name) }}</div>
+      <div class="profile__identity">
+        <h1>{{ u.name }}</h1>
+        <p class="profile__email">{{ u.email }}</p>
+        <div class="profile__roles">
+          @for (role of u.roles; track role) {
+            <span class="badge">{{ roleLabel(role) }}</span>
+          }
+        </div>
+      </div>
+    </header>
+
+    <div class="profile__grid">
+      <article class="card">
+        <h2>Datos de la cuenta</h2>
+        <dl class="fields">
+          <div class="field">
+            <dt>Nombre</dt>
+            <dd>{{ u.name }}</dd>
+          </div>
+          <div class="field">
+            <dt>Correo electrónico</dt>
+            <dd>{{ u.email }}</dd>
+          </div>
+          <div class="field">
+            <dt>Identificador</dt>
+            <dd>#{{ u.id }}</dd>
+          </div>
+          <div class="field">
+            <dt>Tipo de cuenta</dt>
+            <dd>{{ accountType(u.roles) }}</dd>
+          </div>
+        </dl>
+      </article>
+
+      <aside class="card card--muted">
+        <h2>Sesión</h2>
+        <p class="hint">Gestiona el acceso a tu cuenta en este dispositivo.</p>
+        <button type="button" class="danger" (click)="logout()">Cerrar sesión</button>
+      </aside>
+    </div>
+  </section>
+} @else {
+  <section class="profile">
+    <div class="profile__loading" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Cargando tu perfil…</p>
+    </div>
+  </section>
+}

@@ -4,19 +4,8 @@ import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-profile',
-  template: `
-    <h1>Mi perfil</h1>
-    @if (auth.user(); as u) {
-      <ul>
-        <li><strong>Nombre:</strong> {{ u.name }}</li>
-        <li><strong>Email:</strong> {{ u.email }}</li>
-        <li><strong>Roles:</strong> {{ u.roles.join(', ') }}</li>
-      </ul>
-    } @else {
-      <p>Cargando…</p>
-    }
-    <button (click)="logout()">Cerrar sesión</button>
-  `,
+  templateUrl: './profile.html',
+  styleUrl: './profile.scss',
 })
 export class Profile implements OnInit {
   auth = inject(AuthService);
@@ -24,6 +13,30 @@ export class Profile implements OnInit {
 
   ngOnInit() {
     this.auth.me().subscribe();
+  }
+
+  initials(name: string): string {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('');
+  }
+
+  roleLabel(role: string): string {
+    const labels: Record<string, string> = {
+      ADMIN: 'Administrador',
+      SELLER: 'Vendedor',
+      BUYER: 'Comprador',
+    };
+    return labels[role] ?? role;
+  }
+
+  accountType(roles: string[]): string {
+    if (roles.includes('ADMIN')) return 'Administrador';
+    if (roles.includes('SELLER')) return 'Vendedor';
+    return 'Comprador';
   }
 
   logout() {
