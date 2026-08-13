@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, forkJoin, of, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Product } from '../catalog/catalog.service';
 
@@ -93,10 +93,17 @@ export class OrderService {
     this.items.set([]);
   }
 
-  /** Checkout the current cart; the backend splits it into one order per shop. */
+  /**
+   * Checkout the current cart; the backend splits it into one order per shop.
+   * Immediately pays each resulting order (simulated) so the buyer sees a completed
+   * purchase instead of a pending one they'd have to pay separately in "Mis pedidos".
+   */
   checkout(): Observable<Order[]> {
     const body = { items: this.items().map((i) => ({ productId: i.productId, quantity: i.quantity })) };
-    return this.http.post<Order[]>(`${this.base}/orders`, body).pipe(tap(() => this.clear()));
+    return this.http.post<Order[]>(`${this.base}/orders`, body).pipe(
+      switchMap((orders) => (orders.length ? forkJoin(orders.map((o) => this.pay(o.id))) : of([]))),
+      tap(() => this.clear()),
+    );
   }
 
   myOrders(): Observable<Order[]> {

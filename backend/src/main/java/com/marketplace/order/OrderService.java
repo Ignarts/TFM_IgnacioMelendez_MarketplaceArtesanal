@@ -74,11 +74,18 @@ public class OrderService {
         return order;
     }
 
-    /** Buyer confirms receipt: SHIPPED → DELIVERED (this unlocks reviews). */
+    /**
+     * Buyer confirms receipt: PAID or SHIPPED → DELIVERED (this unlocks reviews).
+     * Both states are accepted because the seller's shipping step is optional in the
+     * simulated flow, so a buyer must be able to confirm arrival straight from PAID.
+     */
     @Transactional
     public Order confirmReceipt(User buyer, Long orderId) {
         Order order = ownedByBuyer(buyer, orderId);
-        transition(order, OrderStatus.SHIPPED, OrderStatus.DELIVERED);
+        if (order.getStatus() != OrderStatus.PAID && order.getStatus() != OrderStatus.SHIPPED) {
+            throw new ConflictException("Order must be PAID or SHIPPED to become DELIVERED");
+        }
+        order.setStatus(OrderStatus.DELIVERED);
         return order;
     }
 

@@ -50,7 +50,7 @@ import { Order, OrderService, STATUS_LABELS } from '../../core/order/order.servi
       flex: 1 1 120px; background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 1rem; text-align: center; box-shadow: var(--shadow);
     }
-    .kpi span { display: block; font-size: 1.5rem; font-weight: 700; color: var(--eggplant-700); }
+    .kpi span { display: block; font-size: 1.5rem; font-weight: 700; color: var(--brown-700); }
     .kpi small { color: var(--muted); }
     .orders { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; }
     .order {

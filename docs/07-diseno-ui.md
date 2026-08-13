@@ -1,7 +1,7 @@
 # 07 · Diseño de la interfaz
 
 Los mockups son de baja-media fidelidad: sirven para hacerse una idea del producto, no son el
-diseño final. Mantienen la identidad **berenjena + dorado** y muestran las pantallas más
+diseño final. Mantienen la identidad **arena + dorado** y muestran las pantallas más
 representativas.
 
 > 🖐️ Hay un **prototipo interactivo** navegable en
@@ -42,7 +42,7 @@ otorga la insignia ✓ Verificado visible en el marketplace.
 
 | Elemento | Decisión |
 |----------|----------|
-| **Paleta** | Berenjena (`#5b2a4e`, `#6e3260`, `#8a4178`) + acento dorado (`#b9883b`). |
+| **Paleta** | Arena/marrón (`#6b4423`, `#8a5a2f`, `#a97c4f`) + acento dorado (`#b9883b`). |
 | **Tipografía** | Serif (Georgia) para títulos, sans-serif del sistema para interfaz. |
 | **Tono** | Artesanía cuidada y cercana. |
 
