@@ -127,11 +127,22 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
         @if (auth.isLoggedIn()) {
           <h3>Deja tu valoración</h3>
           <form [formGroup]="form" (ngSubmit)="submitReview(p.id)">
-            <label>Puntuación
-              <select formControlName="rating">
-                @for (n of [5, 4, 3, 2, 1]; track n) { <option [value]="n">{{ stars(n) }}</option> }
-              </select>
-            </label>
+            <div class="rating-field">
+              <span class="field-label">Puntuación</span>
+              <div class="stars-input">
+                @for (n of [1, 2, 3, 4, 5]; track n) {
+                  <button
+                    type="button"
+                    class="star"
+                    [class.on]="n <= form.controls.rating.value"
+                    (click)="setRating(n)"
+                    [attr.aria-label]="n + ' estrellas'"
+                  >
+                    ★
+                  </button>
+                }
+              </div>
+            </div>
             <label>Comentario <textarea formControlName="comment"></textarea></label>
             @if (reviewError()) { <p class="error">{{ reviewError() }}</p> }
             <button type="submit">Publicar reseña</button>
@@ -237,6 +248,17 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
     }
     .review-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
     .verified { font-size: 0.78rem; color: #2f7a43; }
+
+    .rating-field { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.5rem; }
+    .field-label { font-weight: 600; }
+    .stars-input { display: flex; gap: 0.15rem; }
+    .star {
+      background: transparent; border: none; padding: 0;
+      font-size: 1.6rem; line-height: 1; cursor: pointer;
+      color: var(--border);
+    }
+    .star.on { color: var(--gold); }
+    .star:hover { color: var(--gold-dark); }
   `,
 })
 export class Producto implements OnInit {
@@ -297,6 +319,10 @@ export class Producto implements OnInit {
 
   setQty(event: Event) {
     this.quantity.set(Number((event.target as HTMLInputElement).value));
+  }
+
+  setRating(rating: number) {
+    this.form.controls.rating.setValue(rating);
   }
 
   addToCart(product: Product) {
