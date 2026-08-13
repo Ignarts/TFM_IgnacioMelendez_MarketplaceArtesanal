@@ -1,7 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../core/auth/auth.service';
+import { AuthService, ProfileStats } from '../../core/auth/auth.service';
 import { Order, OrderService, STATUS_LABELS } from '../../core/order/order.service';
 
 @Component({
@@ -16,25 +16,32 @@ export class Profile implements OnInit {
   private router = inject(Router);
 
   readonly statusLabels = STATUS_LABELS;
-  readonly recentPurchases = signal<Order[]>([]);
-  readonly recentSales = signal<Order[]>([]);
+  readonly isSeller = computed(() => this.auth.user()?.roles.includes('SELLER') ?? false);
+
+  private readonly purchases = signal<Order[]>([]);
+  private readonly sales = signal<Order[]>([]);
   readonly purchasesLoaded = signal(false);
   readonly salesLoaded = signal(false);
-  readonly isSeller = computed(() => this.auth.user()?.roles.includes('SELLER') ?? false);
+
+  readonly recentPurchases = computed(() => this.latest(this.purchases()));
+  readonly recentSales = computed(() => this.latest(this.sales()));
+
+  readonly stats = signal<ProfileStats | null>(null);
 
   ngOnInit() {
     this.auth.me().subscribe(() => this.loadActivity());
+    this.auth.profileStats().subscribe((stats) => this.stats.set(stats));
   }
 
   private loadActivity() {
     this.orders.myOrders().subscribe((orders) => {
-      this.recentPurchases.set(this.latest(orders));
+      this.purchases.set(orders);
       this.purchasesLoaded.set(true);
     });
 
     if (this.isSeller()) {
       this.orders.shopOrders().subscribe((orders) => {
-        this.recentSales.set(this.latest(orders));
+        this.sales.set(orders);
         this.salesLoaded.set(true);
       });
     }
@@ -49,6 +56,10 @@ export class Profile implements OnInit {
 
   itemCount(order: Order): number {
     return order.items.reduce((n, i) => n + i.quantity, 0);
+  }
+
+  thumbnail(order: Order): string | null {
+    return order.items.find((i) => i.image)?.image ?? null;
   }
 
   initials(name: string): string {

@@ -10,6 +10,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findAllByOrderByCreatedAtDesc();
 
+    List<Review> findByBuyerId(Long buyerId);
+
+    long countByProduct_ShopId(Long shopId);
+
     boolean existsByProductIdAndBuyerId(Long productId, Long buyerId);
 
     @org.springframework.data.jpa.repository.Query(

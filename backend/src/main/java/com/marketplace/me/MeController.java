@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MeController {
 
     private final UserService userService;
+    private final ProfileStatsService profileStatsService;
 
-    public MeController(UserService userService) {
+    public MeController(UserService userService, ProfileStatsService profileStatsService) {
         this.userService = userService;
+        this.profileStatsService = profileStatsService;
     }
 
     @GetMapping
@@ -28,5 +30,13 @@ public class MeController {
         User user = userService.findByEmail(principal.getUsername())
                 .orElseThrow();
         return MeResponse.from(user);
+    }
+
+    @GetMapping("/profile-stats")
+    @Operation(summary = "KPIs agregados del perfil del usuario autenticado", security = @SecurityRequirement(name = "bearerAuth"))
+    public ProfileStatsResponse profileStats(@AuthenticationPrincipal UserDetails principal) {
+        User user = userService.findByEmail(principal.getUsername())
+                .orElseThrow();
+        return profileStatsService.forUser(user);
     }
 }

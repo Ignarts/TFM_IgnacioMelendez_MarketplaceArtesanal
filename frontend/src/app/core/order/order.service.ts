@@ -16,6 +16,7 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
 export interface OrderItem {
   productId: number;
   title: string;
+  image: string | null;
   price: number;
   quantity: number;
 }
