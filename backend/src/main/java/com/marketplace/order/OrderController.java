@@ -53,7 +53,7 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/confirm")
-    @Operation(summary = "Confirm receipt: SHIPPED → DELIVERED (unlocks reviews)")
+    @Operation(summary = "Confirm receipt: PAID or SHIPPED → DELIVERED (unlocks reviews)")
     public OrderResponse confirm(@AuthenticationPrincipal UserDetails principal, @PathVariable Long id) {
         User buyer = userService.getByEmail(principal.getUsername());
         return OrderResponse.from(orderService.confirmReceipt(buyer, id));
