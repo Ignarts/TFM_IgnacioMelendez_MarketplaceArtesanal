@@ -135,6 +135,106 @@ button.danger:hover {
   background: #922019;
 }
 
+/* ---- Activity (recent purchases / sales) ---- */
+.activity {
+  margin-top: 1.25rem;
+}
+
+.activity__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.activity__head h2 {
+  margin: 0;
+}
+.activity__head a {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.empty {
+  color: var(--muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.orders {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.order {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.order__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.order__title {
+  font-weight: 600;
+}
+.order__meta {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.order__total {
+  font-weight: 600;
+  color: var(--gold-dark);
+  white-space: nowrap;
+}
+
+.status {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status--pending {
+  background: #fbe7cf;
+  color: #8a5a00;
+}
+.status--paid {
+  background: #d7e9d3;
+  color: #2f5d24;
+}
+.status--shipped {
+  background: #d3e2f0;
+  color: #1f4e79;
+}
+.status--delivered {
+  background: #dcd3ec;
+  color: #4a2f7a;
+}
+
+@media (max-width: 640px) {
+  .order {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "main total"
+      "status status";
+    row-gap: 0.4rem;
+  }
+  .order__main { grid-area: main; }
+  .order__total { grid-area: total; text-align: right; }
+  .status { grid-area: status; justify-self: start; }
+}
+
 /* ---- Loading ---- */
 .profile__loading {
   display: flex;

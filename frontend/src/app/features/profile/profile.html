@@ -42,6 +42,58 @@
         <button type="button" class="danger" (click)="logout()">Cerrar sesión</button>
       </aside>
     </div>
+
+    <article class="card activity">
+      <header class="activity__head">
+        <h2>Compras recientes</h2>
+        <a routerLink="/pedidos">Ver todas</a>
+      </header>
+      @if (!purchasesLoaded()) {
+        <p class="hint">Cargando…</p>
+      } @else if (recentPurchases().length === 0) {
+        <p class="empty">Todavía no has realizado ninguna compra.</p>
+      } @else {
+        <ul class="orders">
+          @for (order of recentPurchases(); track order.id) {
+            <li class="order">
+              <div class="order__main">
+                <span class="order__title">Pedido #{{ order.id }}</span>
+                <span class="order__meta">{{ itemCount(order) }} artículo(s)</span>
+              </div>
+              <span class="status status--{{ order.status.toLowerCase() }}">{{ statusLabels[order.status] }}</span>
+              <span class="order__total">{{ order.total | number: '1.2-2' }} €</span>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+
+    @if (isSeller()) {
+      <article class="card activity">
+        <header class="activity__head">
+          <h2>Ventas recientes</h2>
+          <a routerLink="/mis-ventas">Ver todas</a>
+        </header>
+        @if (!salesLoaded()) {
+          <p class="hint">Cargando…</p>
+        } @else if (recentSales().length === 0) {
+          <p class="empty">Tu tienda aún no ha recibido ventas.</p>
+        } @else {
+          <ul class="orders">
+            @for (order of recentSales(); track order.id) {
+              <li class="order">
+                <div class="order__main">
+                  <span class="order__title">Pedido #{{ order.id }}</span>
+                  <span class="order__meta">{{ itemCount(order) }} artículo(s)</span>
+                </div>
+                <span class="status status--{{ order.status.toLowerCase() }}">{{ statusLabels[order.status] }}</span>
+                <span class="order__total">{{ order.total | number: '1.2-2' }} €</span>
+              </li>
+            }
+          </ul>
+        }
+      </article>
+    }
   </section>
 } @else {
   <section class="profile">
