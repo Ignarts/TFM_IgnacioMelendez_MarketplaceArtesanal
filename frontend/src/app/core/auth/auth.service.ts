@@ -9,6 +9,19 @@ export interface LoginRequest { email: string; password: string; }
 export interface AuthResponse { token: string; type: string; email: string; roles: string[]; }
 export interface Me { id: number; email: string; name: string; roles: string[]; }
 
+export interface SellerStats {
+  productsSold: number;
+  reviewsReceived: number;
+  avgRating: number;
+  productsOnSale: number;
+}
+export interface ProfileStats {
+  purchaseCount: number;
+  uniqueProductsBought: number;
+  starsGiven: number;
+  seller: SellerStats | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
@@ -30,6 +43,10 @@ export class AuthService {
 
   me(): Observable<Me> {
     return this.http.get<Me>(`${this.base}/me`).pipe(tap((me) => this.user.set(me)));
+  }
+
+  profileStats(): Observable<ProfileStats> {
+    return this.http.get<ProfileStats>(`${this.base}/me/profile-stats`);
   }
 
   logout(): void {

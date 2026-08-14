@@ -18,9 +18,11 @@ public record OrderResponse(
         List<Item> items
 ) {
 
-    public record Item(Long productId, String title, BigDecimal price, int quantity) {
+    public record Item(Long productId, String title, String image, BigDecimal price, int quantity) {
         static Item from(OrderItem oi) {
-            return new Item(oi.getProduct().getId(), oi.getProduct().getTitle(), oi.getPrice(), oi.getQuantity());
+            var images = oi.getProduct().getImages();
+            String image = images.isEmpty() ? null : images.get(0);
+            return new Item(oi.getProduct().getId(), oi.getProduct().getTitle(), image, oi.getPrice(), oi.getQuantity());
         }
     }
 
