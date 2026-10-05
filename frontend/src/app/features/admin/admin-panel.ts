@@ -1,164 +1,112 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { SlicePipe } from '@angular/common';
-import { AdminService, AdminReview, AdminShop, AdminUser } from '../../core/admin/admin.service';
+import {
+  LucideEyeOff,
+  LucideFlag,
+  LucideMessageSquare,
+  LucideStore,
+  LucideTags,
+  LucideUsers,
+} from '@lucide/angular';
+import { AdminService } from '../../core/admin/admin.service';
+import { AdminCategories } from './admin-categories';
+import { AdminHiddenProducts } from './admin-hidden-products';
+import { AdminReports } from './admin-reports';
+import { AdminReviews } from './admin-reviews';
+import { AdminShops } from './admin-shops';
+import { AdminUsers } from './admin-users';
+
+type AdminTab = 'reports' | 'shops' | 'users' | 'reviews' | 'hidden' | 'categories';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [SlicePipe],
+  imports: [
+    AdminCategories,
+    AdminHiddenProducts,
+    AdminReports,
+    AdminReviews,
+    AdminShops,
+    AdminUsers,
+    LucideEyeOff,
+    LucideFlag,
+    LucideMessageSquare,
+    LucideStore,
+    LucideTags,
+    LucideUsers,
+  ],
   template: `
     <h1>Panel de administración</h1>
 
-    <section>
-      <h2>Tiendas pendientes de verificación</h2>
-      @if (pendingShops().length === 0) {
-        <p>No hay tiendas pendientes.</p>
-      } @else {
-        <table>
-          <thead><tr><th>ID</th><th>Nombre</th><th>Creada</th><th>Acción</th></tr></thead>
-          <tbody>
-            @for (shop of pendingShops(); track shop.id) {
-              <tr>
-                <td>{{ shop.id }}</td>
-                <td>{{ shop.name }}</td>
-                <td>{{ shop.createdAt | slice:0:10 }}</td>
-                <td><button (click)="verifyShop(shop)">Verificar</button></td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </section>
+    <div class="tabs" role="tablist" aria-label="Secciones del panel">
+      <button type="button" role="tab" class="tab" [class.active]="tab() === 'reports'"
+              [attr.aria-selected]="tab() === 'reports'" (click)="tab.set('reports')">
+        <svg lucideFlag></svg> Reportes
+        @if (openReports()) { <span class="count">{{ openReports() }}</span> }
+      </button>
+      <button type="button" role="tab" class="tab" [class.active]="tab() === 'shops'"
+              [attr.aria-selected]="tab() === 'shops'" (click)="tab.set('shops')">
+        <svg lucideStore></svg> Tiendas
+        @if (pendingShops()) { <span class="count">{{ pendingShops() }}</span> }
+      </button>
+      <button type="button" role="tab" class="tab" [class.active]="tab() === 'users'"
+              [attr.aria-selected]="tab() === 'users'" (click)="tab.set('users')">
+        <svg lucideUsers></svg> Usuarios
+      </button>
+      <button type="button" role="tab" class="tab" [class.active]="tab() === 'reviews'"
+              [attr.aria-selected]="tab() === 'reviews'" (click)="tab.set('reviews')">
+        <svg lucideMessageSquare></svg> Reseñas
+      </button>
+      <button type="button" role="tab" class="tab" [class.active]="tab() === 'hidden'"
+              [attr.aria-selected]="tab() === 'hidden'" (click)="tab.set('hidden')">
+        <svg lucideEyeOff></svg> Productos retirados
+      </button>
+      <button type="button" role="tab" class="tab" [class.active]="tab() === 'categories'"
+              [attr.aria-selected]="tab() === 'categories'" (click)="tab.set('categories')">
+        <svg lucideTags></svg> Categorías
+      </button>
+    </div>
 
-    <section>
-      <h2>Usuarios</h2>
-      @if (users().length === 0) {
-        <p>Cargando…</p>
-      } @else {
-        <table>
-          <thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Roles</th><th>Estado</th><th>Acción</th></tr></thead>
-          <tbody>
-            @for (user of users(); track user.id) {
-              <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.roles.join(', ') }}</td>
-                <td>{{ user.suspended ? 'Suspendido' : 'Activo' }}</td>
-                <td>
-                  @if (!user.suspended) {
-                    <button (click)="suspendUser(user)">Suspender</button>
-                  } @else {
-                    <button (click)="unsuspendUser(user)">Reactivar</button>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </section>
-
-    <section>
-      <h2>Reseñas reportadas</h2>
-      @if (reviews().length === 0) {
-        <p>No hay reseñas.</p>
-      } @else {
-        <table>
-          <thead><tr><th>ID</th><th>Producto</th><th>Autor</th><th>Nota</th><th>Comentario</th><th>Fecha</th><th>Acción</th></tr></thead>
-          <tbody>
-            @for (review of reviews(); track review.id) {
-              <tr>
-                <td>{{ review.id }}</td>
-                <td>{{ review.productTitle }}</td>
-                <td>{{ review.buyerName }}</td>
-                <td>{{ review.rating }}</td>
-                <td>{{ review.comment }}</td>
-                <td>{{ review.createdAt | slice:0:10 }}</td>
-                <td><button (click)="deleteReview(review)">Eliminar</button></td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </section>
-
-    @if (message()) { <p class="success">{{ message() }}</p> }
-    @if (error()) { <p class="error">{{ error() }}</p> }
+    @switch (tab()) {
+      @case ('reports') { <app-admin-reports (changed)="refreshCounts()" /> }
+      @case ('shops') { <app-admin-shops (changed)="refreshCounts()" /> }
+      @case ('users') { <app-admin-users /> }
+      @case ('reviews') { <app-admin-reviews /> }
+      @case ('hidden') { <app-admin-hidden-products /> }
+      @case ('categories') { <app-admin-categories /> }
+    }
+  `,
+  styles: `
+    .tabs {
+      display: flex; gap: 0.25rem; overflow-x: auto;
+      border-bottom: 1px solid var(--border); margin-bottom: 1.5rem;
+    }
+    .tab {
+      display: inline-flex; align-items: center; gap: 0.4rem; flex: 0 0 auto;
+      border: none; border-bottom: 2px solid transparent; border-radius: 0;
+      padding: 0.6rem 0.9rem; color: var(--muted); background: transparent;
+    }
+    .tab:hover { color: var(--brown-700); background: transparent; }
+    .tab.active { color: var(--brown-700); border-bottom-color: var(--gold); font-weight: 600; }
+    .tab svg { width: 17px; height: 17px; }
+    .count {
+      min-width: 1.25rem; padding: 0 0.4rem; border-radius: 999px;
+      background: var(--gold); color: var(--brown-900);
+      font-size: 0.72rem; font-weight: 700; line-height: 1.25rem; text-align: center;
+    }
   `,
 })
 export class AdminPanel implements OnInit {
   private adminService = inject(AdminService);
 
-  pendingShops = signal<AdminShop[]>([]);
-  users = signal<AdminUser[]>([]);
-  reviews = signal<AdminReview[]>([]);
-  message = signal('');
-  error = signal('');
+  tab = signal<AdminTab>('reports');
+  openReports = signal(0);
+  pendingShops = signal(0);
 
   ngOnInit(): void {
-    this.loadPendingShops();
-    this.loadUsers();
-    this.loadReviews();
+    this.refreshCounts();
   }
 
-  private loadPendingShops(): void {
-    this.adminService.listPendingShops().subscribe({
-      next: (shops) => this.pendingShops.set(shops),
-      error: () => this.error.set('Error al cargar tiendas.'),
-    });
-  }
-
-  private loadUsers(): void {
-    this.adminService.listUsers().subscribe({
-      next: (users) => this.users.set(users),
-      error: () => this.error.set('Error al cargar usuarios.'),
-    });
-  }
-
-  private loadReviews(): void {
-    this.adminService.listReviews().subscribe({
-      next: (reviews) => this.reviews.set(reviews),
-      error: () => this.error.set('Error al cargar reseñas.'),
-    });
-  }
-
-  verifyShop(shop: AdminShop): void {
-    this.adminService.verifyShop(shop.id).subscribe({
-      next: () => {
-        this.message.set(`Tienda "${shop.name}" verificada.`);
-        this.loadPendingShops();
-      },
-      error: () => this.error.set('Error al verificar la tienda.'),
-    });
-  }
-
-  suspendUser(user: AdminUser): void {
-    this.adminService.suspendUser(user.id).subscribe({
-      next: (updated) => {
-        this.users.update((list) => list.map((u) => (u.id === updated.id ? updated : u)));
-        this.message.set(`Usuario "${user.name}" suspendido.`);
-      },
-      error: () => this.error.set('Error al suspender usuario.'),
-    });
-  }
-
-  unsuspendUser(user: AdminUser): void {
-    this.adminService.unsuspendUser(user.id).subscribe({
-      next: (updated) => {
-        this.users.update((list) => list.map((u) => (u.id === updated.id ? updated : u)));
-        this.message.set(`Usuario "${user.name}" reactivado.`);
-      },
-      error: () => this.error.set('Error al reactivar usuario.'),
-    });
-  }
-
-  deleteReview(review: AdminReview): void {
-    this.adminService.deleteReview(review.id).subscribe({
-      next: () => {
-        this.reviews.update((list) => list.filter((r) => r.id !== review.id));
-        this.message.set(`Reseña de "${review.buyerName}" eliminada.`);
-      },
-      error: () => this.error.set('Error al eliminar la reseña.'),
-    });
+  refreshCounts(): void {
+    this.adminService.listReports().subscribe((r) => this.openReports.set(r.length));
+    this.adminService.listPendingShops().subscribe((s) => this.pendingShops.set(s.length));
   }
 }

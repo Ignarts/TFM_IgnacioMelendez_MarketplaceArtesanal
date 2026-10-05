@@ -56,7 +56,7 @@ public class ProfileStatsService {
             long reviewsReceived = reviewRepository.countByProduct_ShopId(shop.getId());
             BigDecimal avg = reviewRepository.avgRatingByShopId(shop.getId());
             BigDecimal avgRating = avg == null ? BigDecimal.ZERO : avg.setScale(2, RoundingMode.HALF_UP);
-            long productsOnSale = productRepository.countByShopId(shop.getId());
+            long productsOnSale = productRepository.countByShopIdAndHiddenFalse(shop.getId());
             seller = new ProfileStatsResponse.SellerStats(productsSold, reviewsReceived, avgRating, productsOnSale);
         }
 

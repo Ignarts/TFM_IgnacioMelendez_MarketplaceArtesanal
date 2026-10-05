@@ -47,11 +47,11 @@ reseñas verificadas (solo quien compró).
 Sistema de reputación con score e insignias, panel de admin, batería de tests, CI y redacción
 del análisis comparativo.
 
-- [ ] Entidad `Reputacion` y cálculo del score.
-- [ ] Insignias y antifraude.
-- [ ] Panel de admin (verificar vendedores, moderar).
-- [ ] Tests backend (JUnit/Mockito) y frontend (Jasmine/Karma).
-- [ ] CI básico.
+- [x] Entidad `Reputacion` y cálculo del score.
+- [x] Insignias y antifraude.
+- [x] Panel de admin (verificar vendedores, moderar).
+- [x] Tests backend (JUnit/Mockito) y frontend (Jasmine/Karma).
+- [x] CI básico.
 - [ ] Análisis comparativo en la memoria.
 
 ## Consejo de alcance

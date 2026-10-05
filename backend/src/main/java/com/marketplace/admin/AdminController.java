@@ -1,5 +1,6 @@
 package com.marketplace.admin;
 
+import com.marketplace.common.ConflictException;
 import com.marketplace.common.NotFoundException;
 import com.marketplace.reputation.ReputationService;
 import com.marketplace.review.ReviewRepository;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,9 +85,13 @@ public class AdminController {
     @PostMapping("/users/{id}/suspend")
     @Transactional
     @Operation(summary = "Suspend a user account")
-    public AdminUserDto suspendUser(@PathVariable Long id) {
+    public AdminUserDto suspendUser(@AuthenticationPrincipal UserDetails principal, @PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
+        // An admin locking themselves out would leave the back-office unreachable.
+        if (user.getEmail().equals(principal.getUsername())) {
+            throw new ConflictException("You cannot suspend your own account");
+        }
         user.setSuspended(true);
         userRepository.save(user);
         return AdminUserDto.from(user);

@@ -13,4 +13,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     long countByShopIdAndStatus(Long shopId, OrderStatus status);
 
     long countByShopId(Long shopId);
+
+    boolean existsByItems_Product_Id(Long productId);
 }

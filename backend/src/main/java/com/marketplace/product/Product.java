@@ -50,6 +50,11 @@ public class Product {
     @Column(name = "url", length = 1000) // image URLs can be long (e.g. CDN thumbnails)
     private List<String> images = new ArrayList<>();
 
+    // Set by an admin when moderating a reported product: it disappears from the public catalog
+    // but stays in the database so past orders and reviews keep pointing at it.
+    @Column(nullable = false)
+    private boolean hidden = false;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -77,6 +82,9 @@ public class Product {
 
     public List<String> getImages() { return images; }
     public void setImages(List<String> images) { this.images = images; }
+
+    public boolean isHidden() { return hidden; }
+    public void setHidden(boolean hidden) { this.hidden = hidden; }
 
     public Instant getCreatedAt() { return createdAt; }
 }

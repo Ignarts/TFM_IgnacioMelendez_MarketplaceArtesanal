@@ -13,10 +13,17 @@ una comprobación de **propiedad del recurso**.
 | `/api/cart` · `/api/checkout` | `POST` | BUYER | — |
 | `/api/me/orders` | `GET` | BUYER | Solo sus pedidos |
 | `/api/products/{id}/reviews` | `POST` | BUYER | Solo si lo compró |
+| `/api/me/wishlist` · `/api/me/wishlist/{productId}` | `GET` · `PUT` · `DELETE` | BUYER | Solo su lista |
+| `/api/reports` | `POST` | BUYER | Un reporte abierto por usuario y objetivo |
+| `/api/seller/shop` | `PUT` | SELLER | Solo su tienda |
 | `/api/seller/products` | `POST` | SELLER | — |
 | `/api/seller/products/{id}` | `PUT` · `DELETE` | SELLER | **Producto de su tienda** |
+| `/api/seller/reviews` · `/api/seller/reviews/{id}/reply` | `GET` · `PUT` | SELLER | **Reseña de un producto suyo** |
 | `/api/admin/shops/{id}/verify` | `POST` | ADMIN | — |
-| `/api/admin/users/{id}/suspend` | `POST` | ADMIN | — |
+| `/api/admin/users/{id}/suspend` | `POST` | ADMIN | No puede suspenderse a sí mismo |
+| `/api/admin/categories` · `/api/admin/categories/{id}` | `POST` · `PUT` · `DELETE` | ADMIN | No se borra una categoría en uso |
+| `/api/admin/reports` · `/api/admin/reports/{id}/dismiss` | `GET` · `POST` | ADMIN | — |
+| `/api/admin/products/{id}/hide` · `/restore` | `POST` | ADMIN | — |
 
 > Los niveles de acceso son **acumulables**: un `SELLER` o un `ADMIN` también puede usar los
 > endpoints de `BUYER`.
