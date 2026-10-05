@@ -197,9 +197,6 @@ Las imágenes de los productos demo son **fotos reales de [Wikimedia Commons](ht
 - Se hace **hotlink** directo al CDN de Wikimedia (suficiente para una demo). Para independencia
   total de la red habría que descargar las imágenes a `assets/` y servirlas localmente.
 
-> ⚠️ Como las URLs apuntan a archivos concretos de Commons, si alguno se renombra o retira en el
-> futuro esa imagen dejaría de cargar; bastaría con re-obtener esa entrada del mapa.
-
 ## 📚 Documentación
 
 La documentación completa está en [`docs/`](docs/README.md). Puntos de entrada recomendados:
