@@ -12,6 +12,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/orders/orders').then((m) => m.Orders),
   },
   {
+    path: 'favoritos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/wishlist/favoritos').then((m) => m.Favoritos),
+  },
+  {
     path: 'mis-ventas',
     canActivate: [roleGuard('SELLER')],
     loadComponent: () => import('./features/seller/mis-ventas').then((m) => m.MisVentas),

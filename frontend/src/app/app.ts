@@ -4,6 +4,7 @@ import {
   LucideChartColumn,
   LucideCircleUser,
   LucideCompass,
+  LucideHeart,
   LucideLogIn,
   LucideLogOut,
   LucidePackage,
@@ -14,6 +15,7 @@ import {
 } from '@lucide/angular';
 import { AuthService } from './core/auth/auth.service';
 import { OrderService } from './core/order/order.service';
+import { WishlistService } from './core/wishlist/wishlist.service';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +25,7 @@ import { OrderService } from './core/order/order.service';
     LucideChartColumn,
     LucideCircleUser,
     LucideCompass,
+    LucideHeart,
     LucideLogIn,
     LucideLogOut,
     LucidePackage,
@@ -38,6 +41,7 @@ export class App {
   auth = inject(AuthService);
   cart = inject(OrderService);
   private router = inject(Router);
+  private wishlist = inject(WishlistService);
 
   isSeller = computed(() => this.auth.user()?.roles.includes('SELLER') ?? false);
   isAdmin = computed(() => this.auth.user()?.roles.includes('ADMIN') ?? false);
@@ -51,6 +55,7 @@ export class App {
 
   logout() {
     this.auth.logout();
+    this.wishlist.clear();
     this.router.navigate(['/']);
   }
 }

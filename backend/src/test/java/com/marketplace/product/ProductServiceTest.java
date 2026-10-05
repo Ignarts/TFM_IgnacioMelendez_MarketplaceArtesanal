@@ -1,6 +1,7 @@
 package com.marketplace.product;
 
 import com.marketplace.category.CategoryRepository;
+import com.marketplace.order.OrderRepository;
 import com.marketplace.product.dto.ProductRequest;
 import com.marketplace.shop.Shop;
 import com.marketplace.shop.ShopService;
@@ -24,6 +25,7 @@ class ProductServiceTest {
     @Mock private ProductRepository productRepository;
     @Mock private CategoryRepository categoryRepository;
     @Mock private ShopService shopService;
+    @Mock private OrderRepository orderRepository;
     @InjectMocks private ProductService productService;
 
     @Test

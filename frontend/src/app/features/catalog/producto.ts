@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -6,6 +6,8 @@ import {
   LucideArrowLeft,
   LucideBadgeCheck,
   LucideCheck,
+  LucideFlag,
+  LucideHeart,
   LucideImageOff,
   LucideShoppingCart,
   LucideStore,
@@ -13,7 +15,9 @@ import {
 import { AuthService } from '../../core/auth/auth.service';
 import { CatalogService, Product, Review } from '../../core/catalog/catalog.service';
 import { OrderService } from '../../core/order/order.service';
+import { ReportService, ReportTargetType } from '../../core/report/report.service';
 import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputation/reputation.service';
+import { WishlistService } from '../../core/wishlist/wishlist.service';
 
 @Component({
   selector: 'app-producto',
@@ -21,10 +25,13 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
     RouterLink,
     DecimalPipe,
     DatePipe,
+    NgTemplateOutlet,
     ReactiveFormsModule,
     LucideArrowLeft,
     LucideBadgeCheck,
     LucideCheck,
+    LucideFlag,
+    LucideHeart,
     LucideImageOff,
     LucideShoppingCart,
     LucideStore,
@@ -59,7 +66,22 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
         </div>
 
         <div class="details">
-          <h1>{{ p.title }}</h1>
+          <div class="title-row">
+            <h1>{{ p.title }}</h1>
+            @if (auth.isLoggedIn()) {
+              <button
+                type="button"
+                class="fav"
+                [class.saved]="wishlist.has(p.id)"
+                [attr.aria-pressed]="wishlist.has(p.id)"
+                [attr.aria-label]="wishlist.has(p.id) ? 'Quitar de favoritos' : 'Guardar en favoritos'"
+                [title]="wishlist.has(p.id) ? 'Quitar de favoritos' : 'Guardar en favoritos'"
+                (click)="toggleFavourite(p)"
+              >
+                <svg lucideHeart></svg>
+              </button>
+            }
+          </div>
 
           @if (averageRating(); as avg) {
             <p class="rating-summary">
@@ -101,6 +123,20 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
               <p class="out-of-stock">Sin stock disponible.</p>
             }
           </div>
+
+          @if (auth.isLoggedIn()) {
+            <div class="report-area">
+              @if (wasReported('PRODUCT', p.id)) {
+                <p class="reported">Gracias. Un administrador revisará tu reporte.</p>
+              } @else if (isReporting('PRODUCT', p.id)) {
+                <ng-container *ngTemplateOutlet="reportFormTpl" />
+              } @else {
+                <button type="button" class="report-link" (click)="startReport('PRODUCT', p.id)">
+                  <svg lucideFlag></svg> Reportar producto
+                </button>
+              }
+            </div>
+          }
         </div>
       </div>
 
@@ -119,6 +155,23 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
                 <span class="stars">{{ stars(r.rating) }}</span>
                 <small>{{ r.createdAt | date: 'dd/MM/yyyy' }}</small>
                 @if (r.comment) { <p>{{ r.comment }}</p> }
+                @if (r.sellerReply) {
+                  <div class="seller-reply">
+                    <small><svg lucideStore></svg> Respuesta de {{ p.shopName }}</small>
+                    <p>{{ r.sellerReply }}</p>
+                  </div>
+                }
+                @if (auth.isLoggedIn()) {
+                  @if (wasReported('REVIEW', r.id)) {
+                    <p class="reported">Gracias. Un administrador revisará tu reporte.</p>
+                  } @else if (isReporting('REVIEW', r.id)) {
+                    <ng-container *ngTemplateOutlet="reportFormTpl" />
+                  } @else {
+                    <button type="button" class="report-link" (click)="startReport('REVIEW', r.id)">
+                      <svg lucideFlag></svg> Reportar
+                    </button>
+                  }
+                }
               </li>
             }
           </ul>
@@ -156,6 +209,22 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
     } @else {
       <p>Cargando…</p>
     }
+
+    <ng-template #reportFormTpl>
+      <form [formGroup]="reportForm" (ngSubmit)="sendReport()" class="report-form">
+        <textarea
+          formControlName="reason"
+          rows="2"
+          maxlength="500"
+          placeholder="Cuéntanos el problema: no es artesanal, contenido ofensivo, engañoso…"
+        ></textarea>
+        @if (reportError()) { <p class="error">{{ reportError() }}</p> }
+        <div class="report-actions">
+          <button type="submit" [disabled]="reportForm.invalid">Enviar reporte</button>
+          <button type="button" (click)="reportTarget.set(null)">Cancelar</button>
+        </div>
+      </form>
+    </ng-template>
   `,
   styles: `
     .back-link {
@@ -205,6 +274,14 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
 
     /* ---- Details ---- */
     h1 { margin-bottom: 0.4rem; }
+    .title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .fav {
+      flex: 0 0 auto; display: inline-flex; padding: 0.5rem; border-radius: 50%;
+      color: var(--brown-600);
+    }
+    .fav svg { width: 22px; height: 22px; }
+    .fav.saved { color: #c0392b; border-color: #f0c4bf; background: #fdf0ee; }
+    .fav.saved svg { fill: currentColor; }
     .rating-summary { display: flex; align-items: center; gap: 0.4rem; margin: 0 0 0.5rem; }
     .stars { color: var(--gold); letter-spacing: 2px; }
     .price { font-size: 1.75rem; font-weight: 700; color: var(--gold-dark); margin: 0 0 1rem; }
@@ -259,6 +336,23 @@ import { Reputation, ReputationService, BADGE_LABELS } from '../../core/reputati
     }
     .star.on { color: var(--gold); }
     .star:hover { color: var(--gold-dark); }
+
+    .seller-reply small { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 600; color: var(--brown-700); }
+    .seller-reply svg { width: 14px; height: 14px; }
+
+    /* ---- Reports ---- */
+    .report-area { margin-top: 1.5rem; }
+    .report-link {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      border: none; background: transparent; padding: 0; margin-top: 0.4rem;
+      font-size: 0.8rem; color: var(--muted);
+    }
+    .report-link:hover { background: transparent; color: var(--danger); }
+    .report-link svg { width: 13px; height: 13px; }
+    .report-form { margin-top: 0.6rem; max-width: none; gap: 0.5rem; }
+    .report-actions { display: flex; gap: 0.5rem; }
+    .report-actions button { padding: 0.35rem 0.9rem; font-size: 0.85rem; }
+    .reported { margin: 0.5rem 0 0; font-size: 0.85rem; color: #2f7a43; }
   `,
 })
 export class Producto implements OnInit {
@@ -267,7 +361,9 @@ export class Producto implements OnInit {
   private fb = inject(FormBuilder);
   private cart = inject(OrderService);
   private reputationService = inject(ReputationService);
+  private reports = inject(ReportService);
   auth = inject(AuthService);
+  wishlist = inject(WishlistService);
 
   product = signal<Product | null>(null);
   activeImage = signal('');
@@ -278,6 +374,10 @@ export class Producto implements OnInit {
   added = signal(false);
   reviewError = signal('');
 
+  reportTarget = signal<{ type: ReportTargetType; id: number } | null>(null);
+  reportError = signal('');
+  private reportedKeys = signal<ReadonlySet<string>>(new Set());
+
   averageRating = computed(() => {
     const list = this.reviews();
     return list.length ? list.reduce((s, r) => s + r.rating, 0) / list.length : 0;
@@ -286,6 +386,10 @@ export class Producto implements OnInit {
   form = this.fb.nonNullable.group({
     rating: [5, [Validators.required]],
     comment: [''],
+  });
+
+  reportForm = this.fb.nonNullable.group({
+    reason: ['', [Validators.required, Validators.maxLength(500)]],
   });
 
   ngOnInit() {
@@ -302,6 +406,7 @@ export class Producto implements OnInit {
       error: () => this.notFound.set(true),
     });
     this.loadReviews(id);
+    if (this.auth.isLoggedIn()) this.wishlist.ensureLoaded();
   }
 
   loadReviews(id: number) {
@@ -329,6 +434,43 @@ export class Producto implements OnInit {
     this.cart.add(product, this.quantity());
     this.added.set(true);
     setTimeout(() => this.added.set(false), 2000);
+  }
+
+  toggleFavourite(product: Product) {
+    this.wishlist.toggle(product.id).subscribe();
+  }
+
+  isReporting(type: ReportTargetType, id: number): boolean {
+    const target = this.reportTarget();
+    return target?.type === type && target.id === id;
+  }
+
+  wasReported(type: ReportTargetType, id: number): boolean {
+    return this.reportedKeys().has(`${type}:${id}`);
+  }
+
+  startReport(type: ReportTargetType, id: number) {
+    this.reportForm.reset();
+    this.reportError.set('');
+    this.reportTarget.set({ type, id });
+  }
+
+  sendReport() {
+    const target = this.reportTarget();
+    if (!target || this.reportForm.invalid) return;
+    this.reports.report(target.type, target.id, this.reportForm.getRawValue().reason.trim()).subscribe({
+      next: () => this.markReported(target.type, target.id),
+      error: (e) => {
+        // A previous open report counts as done for the user.
+        if (e.status === 409) this.markReported(target.type, target.id);
+        else this.reportError.set('No se pudo enviar el reporte');
+      },
+    });
+  }
+
+  private markReported(type: ReportTargetType, id: number) {
+    this.reportedKeys.update((keys) => new Set(keys).add(`${type}:${id}`));
+    this.reportTarget.set(null);
   }
 
   submitReview(productId: number) {

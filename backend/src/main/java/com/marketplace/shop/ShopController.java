@@ -1,6 +1,6 @@
 package com.marketplace.shop;
 
-import com.marketplace.shop.dto.CreateShopRequest;
+import com.marketplace.shop.dto.ShopRequest;
 import com.marketplace.shop.dto.ShopResponse;
 import com.marketplace.user.User;
 import com.marketplace.user.UserService;
@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class ShopController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Open a shop (grants the SELLER role)")
     public ShopResponse openShop(@AuthenticationPrincipal UserDetails principal,
-                                 @Valid @RequestBody CreateShopRequest request) {
+                                 @Valid @RequestBody ShopRequest request) {
         User owner = userService.getByEmail(principal.getUsername());
         return ShopResponse.from(shopService.openShop(owner, request));
     }
@@ -41,5 +42,14 @@ public class ShopController {
     public ShopResponse myShop(@AuthenticationPrincipal UserDetails principal) {
         User owner = userService.getByEmail(principal.getUsername());
         return ShopResponse.from(shopService.getByOwner(owner));
+    }
+
+    @PutMapping
+    @PreAuthorize("hasRole('SELLER')")
+    @Operation(summary = "Update the authenticated user's shop name and description")
+    public ShopResponse updateShop(@AuthenticationPrincipal UserDetails principal,
+                                   @Valid @RequestBody ShopRequest request) {
+        User owner = userService.getByEmail(principal.getUsername());
+        return ShopResponse.from(shopService.update(owner, request));
     }
 }

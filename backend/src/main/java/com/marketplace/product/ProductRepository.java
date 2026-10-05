@@ -10,4 +10,10 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     List<Product> findByShopId(Long shopId);
 
     long countByShopId(Long shopId);
+
+    long countByShopIdAndHiddenFalse(Long shopId);
+
+    boolean existsByCategoryId(Long categoryId);
+
+    List<Product> findByHiddenTrue();
 }

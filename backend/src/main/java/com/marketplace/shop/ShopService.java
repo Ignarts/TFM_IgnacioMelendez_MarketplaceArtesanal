@@ -2,7 +2,7 @@ package com.marketplace.shop;
 
 import com.marketplace.common.ConflictException;
 import com.marketplace.common.NotFoundException;
-import com.marketplace.shop.dto.CreateShopRequest;
+import com.marketplace.shop.dto.ShopRequest;
 import com.marketplace.user.Role;
 import com.marketplace.user.User;
 import com.marketplace.user.UserService;
@@ -25,7 +25,7 @@ public class ShopService {
      * database on every request, so the new role takes effect on the next call (no re-login).
      */
     @Transactional
-    public Shop openShop(User owner, CreateShopRequest request) {
+    public Shop openShop(User owner, ShopRequest request) {
         if (shopRepository.existsByOwnerId(owner.getId())) {
             throw new ConflictException("User already owns a shop");
         }
@@ -36,6 +36,15 @@ public class ShopService {
         userService.save(owner);
 
         return shop;
+    }
+
+    /** Ownership is implicit: a seller can only reach their own shop (1:1 with the owner). */
+    @Transactional
+    public Shop update(User owner, ShopRequest request) {
+        Shop shop = getByOwner(owner);
+        shop.setName(request.name().trim());
+        shop.setDescription(request.description());
+        return shopRepository.save(shop);
     }
 
     public Shop getByOwner(User owner) {

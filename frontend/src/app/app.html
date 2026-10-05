@@ -11,6 +11,10 @@
     <span class="nav-label">Carrito</span>
   </a>
   @if (auth.isLoggedIn()) {
+    <a routerLink="/favoritos" class="nav-item" aria-label="Favoritos">
+      <svg lucideHeart></svg>
+      <span class="nav-label">Favoritos</span>
+    </a>
     <a routerLink="/pedidos" class="nav-item" aria-label="Mis pedidos">
       <svg lucidePackage></svg>
       <span class="nav-label">Pedidos</span>

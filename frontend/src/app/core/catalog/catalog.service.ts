@@ -16,9 +16,13 @@ export interface Product {
   price: number;
   stock: number;
   images: string[];
+  /** Withdrawn from the public catalog by an admin; only its seller still sees it. */
+  hidden: boolean;
 }
 
 export interface Shop { id: number; ownerId: number; name: string; description: string | null; verified: boolean; }
+
+export interface ShopRequest { name: string; description?: string | null; }
 
 export interface ProductRequest {
   title: string;
@@ -34,10 +38,13 @@ export interface ProductFilters { q?: string; categoryId?: number; minPrice?: nu
 export interface Review {
   id: number;
   productId: number;
+  productTitle: string;
   buyerName: string;
   rating: number;
   comment: string | null;
   createdAt: string;
+  sellerReply: string | null;
+  sellerReplyAt: string | null;
 }
 
 export interface ReviewRequest { rating: number; comment?: string | null; }
@@ -67,8 +74,12 @@ export class CatalogService {
   }
 
   // Seller shop
-  openShop(req: { name: string; description?: string }): Observable<Shop> {
+  openShop(req: ShopRequest): Observable<Shop> {
     return this.http.post<Shop>(`${this.base}/seller/shop`, req);
+  }
+
+  updateShop(req: ShopRequest): Observable<Shop> {
+    return this.http.put<Shop>(`${this.base}/seller/shop`, req);
   }
 
   myShop(): Observable<Shop> {
@@ -98,5 +109,14 @@ export class CatalogService {
 
   createReview(productId: number, req: ReviewRequest): Observable<Review> {
     return this.http.post<Review>(`${this.base}/products/${productId}/reviews`, req);
+  }
+
+  // Reviews received by the seller's shop
+  sellerReviews(): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.base}/seller/reviews`);
+  }
+
+  replyToReview(reviewId: number, reply: string): Observable<Review> {
+    return this.http.put<Review>(`${this.base}/seller/reviews/${reviewId}/reply`, { reply });
   }
 }

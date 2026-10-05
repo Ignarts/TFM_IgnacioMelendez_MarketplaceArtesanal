@@ -44,6 +44,9 @@ public class OrderService {
             Product product = productRepository.findById(line.productId())
                     .orElseThrow(() -> new NotFoundException("Product not found: " + line.productId()));
 
+            if (product.isHidden()) {
+                throw new ConflictException("Product is no longer available: " + product.getTitle());
+            }
             if (product.getStock() < line.quantity()) {
                 throw new ConflictException("Not enough stock for: " + product.getTitle());
             }

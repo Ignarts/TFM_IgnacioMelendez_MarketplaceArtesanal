@@ -15,7 +15,8 @@ public record ProductResponse(
         String description,
         BigDecimal price,
         int stock,
-        List<String> images
+        List<String> images,
+        boolean hidden
 ) {
 
     public static ProductResponse from(Product p) {
@@ -29,7 +30,8 @@ public record ProductResponse(
                 p.getDescription(),
                 p.getPrice(),
                 p.getStock(),
-                List.copyOf(p.getImages())
+                List.copyOf(p.getImages()),
+                p.isHidden()
         );
     }
 }

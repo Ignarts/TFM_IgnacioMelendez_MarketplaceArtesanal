@@ -33,7 +33,12 @@ export class Login {
     this.error.set('');
     this.auth.login(this.form.getRawValue()).subscribe({
       next: () => this.router.navigate(['/profile']),
-      error: () => this.error.set('Credenciales no válidas'),
+      error: (e) =>
+        this.error.set(
+          e.status === 403
+            ? 'Tu cuenta está suspendida. Contacta con el equipo de soporte.'
+            : 'Credenciales no válidas',
+        ),
     });
   }
 }

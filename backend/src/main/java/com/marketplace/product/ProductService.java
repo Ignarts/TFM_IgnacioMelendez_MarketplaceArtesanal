@@ -2,7 +2,9 @@ package com.marketplace.product;
 
 import com.marketplace.category.Category;
 import com.marketplace.category.CategoryRepository;
+import com.marketplace.common.ConflictException;
 import com.marketplace.common.NotFoundException;
+import com.marketplace.order.OrderRepository;
 import com.marketplace.product.dto.ProductRequest;
 import com.marketplace.shop.Shop;
 import com.marketplace.shop.ShopService;
@@ -24,18 +26,22 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ShopService shopService;
+    private final OrderRepository orderRepository;
 
     public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository,
-                          ShopService shopService) {
+                          ShopService shopService, OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.shopService = shopService;
+        this.orderRepository = orderRepository;
     }
 
     // ponytail: returns full list, no pagination — add Pageable when the catalog grows
     public List<Product> search(String q, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice) {
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            // Products withdrawn by moderation never show up in the public catalog.
+            predicates.add(cb.isFalse(root.get("hidden")));
             if (q != null && !q.isBlank()) {
                 predicates.add(cb.like(cb.lower(root.get("title")), "%" + q.toLowerCase() + "%"));
             }
@@ -53,8 +59,10 @@ public class ProductService {
         return productRepository.findAll(spec);
     }
 
+    /** Public product detail: a hidden product behaves as if it didn't exist. */
     public Product getById(Long id) {
         return productRepository.findById(id)
+                .filter(p -> !p.isHidden())
                 .orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
@@ -86,7 +94,27 @@ public class ProductService {
     @Transactional
     public void delete(User seller, Long productId) {
         Product product = getOwned(seller, productId);
+        // Orders (and the verified reviews that depend on them) keep referencing the product.
+        if (orderRepository.existsByItems_Product_Id(productId)) {
+            throw new ConflictException("A product that has already been ordered cannot be deleted");
+        }
         productRepository.delete(product);
+    }
+
+    // ── Moderation (ADMIN) ───────────────────────────────────────────────────
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Product> listHidden() {
+        return productRepository.findByHiddenTrue();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public Product setHidden(Long productId, boolean hidden) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+        product.setHidden(hidden);
+        return productRepository.save(product);
     }
 
     /** Loads a product and enforces the ownership rule: it must belong to the seller's shop. */

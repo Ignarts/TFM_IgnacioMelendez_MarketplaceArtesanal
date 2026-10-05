@@ -38,6 +38,12 @@ public class Review {
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
+    // Public answer from the shop owner (one per review, editable).
+    @Column(columnDefinition = "TEXT")
+    private String sellerReply;
+
+    private Instant sellerReplyAt;
+
     public Review() {}
 
     public Review(Product product, Long buyerId, String buyerName, int rating, String comment) {
@@ -66,4 +72,10 @@ public class Review {
     public void setComment(String comment) { this.comment = comment; }
 
     public Instant getCreatedAt() { return createdAt; }
+
+    public String getSellerReply() { return sellerReply; }
+    public void setSellerReply(String sellerReply) { this.sellerReply = sellerReply; }
+
+    public Instant getSellerReplyAt() { return sellerReplyAt; }
+    public void setSellerReplyAt(Instant sellerReplyAt) { this.sellerReplyAt = sellerReplyAt; }
 }
